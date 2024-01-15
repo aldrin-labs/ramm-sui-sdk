@@ -1,0 +1,10 @@
+{
+  "name": "ramm-sui-sdk",
+  "version": "1.0.0",
+  "description": "TypeScript SDK for the Sui Move RAMM",
+  "main": "index.js",
+  "repository": "https://github.com/aldrin-labs/ramm-sui-sdk.git",
+  "author": "Alexandre Baldé <alexandre@aldrin.com>",
+  "license": "AGPL-3.0",
+  "private": false
+}
