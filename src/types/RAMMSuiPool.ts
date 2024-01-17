@@ -43,7 +43,7 @@ export class RAMMSuiPool {
      * After pool population and initialization, it cannot be changed - it becomes effectively a
      * constant.
      */
-    assetCount: number;
+    readonly assetCount: number;
 
     /**
      * Sui Client used to build PTBs with which to interact with the RAMM.
