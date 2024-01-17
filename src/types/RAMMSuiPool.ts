@@ -1,6 +1,33 @@
 import { SuiClient } from '@mysten/sui.js/client';
 
-export class RAMMSuiPoolProps {
+export class AssetConfig {
+    /**
+     * Address of the Switchboard `Aggregator`s for this asset.
+     */
+    assetAggregators: string;
+    /**
+     * An asset's type `<package-id>::<module-name>::<type-name>`.
+     */
+    assetTypes: string;
+    /**
+     * An asset's ticker symbol (e.g. `WETH` for Wrapped Ethereum bridged in Sui).
+     */
+    assetTickers: string;
+    /**
+     * An asset's decimal place count.
+     */
+    assetDecimalPlaces: number;
+    /**
+     * The decimal place count of an asset's LP token.
+     */
+    lpTokensDecimalPlaces: number;
+    /**
+     * An asset's minimum trade amount, specified with the asset's decimal place count.
+     */
+    minimumTradeAmount: number;
+}
+
+export class RAMMSuiPoolConfig {
     name: string;
     packageId: string;
     address: string;
@@ -8,11 +35,7 @@ export class RAMMSuiPoolProps {
 
     suiClient: SuiClient;
 
-    assetAggregators: string[];
-    assetTypes: string[];
-    assetTickers: string[];
-    assetDecimalPlaces: number[];
-    lpTokensDecimalPlaces: number[];
+    assetConfigs: AssetConfig[];
 
     delta?: number;
     baseFee?: number;
@@ -51,25 +74,9 @@ export class RAMMSuiPool {
     suiClient: SuiClient;
 
     /**
-     * List of addresses of the Switchboard `Aggregator`s of each of the pool's assets.
+     * Metadata for each of the pool's assets.
      */
-    assetAggregators: string[];
-    /**
-     * List with the types of each of the pool's assets.
-     */
-    assetTypes: string[];
-    /**
-     * List of each asset's ticker symbol (e.g. `ETH` for Sui's wrapped Ethereum).
-     */
-    assetTickers: string[];
-    /**
-     * List of each asset's decimal place count.
-     */
-    assetDecimalPlaces: number[];
-    /**
-     * List of decimal place counts of each asset's LP token.
-     */
-    lpTokensDecimalPlaces: number[];
+    assetConfigs: AssetConfig[];
 
     /**
      * The pool's permitted deviation from base imbalance ratio of 1: - real number \in [0, 1[.
@@ -103,32 +110,29 @@ export class RAMMSuiPool {
             address,
             assetCount,
             suiClient,
-            assetAggregators,
-            assetTypes,
-            assetTickers,
-            assetDecimalPlaces,
-            lpTokensDecimalPlaces,
+            assetConfigs,
             delta = 0.25,
             baseFee = 0.001,
             baseLeverage = 100,
             protocolFee = 0.5
-    }: RAMMSuiPoolProps) {
-      this.name = name;
-      this.packageId = packageId;
-      this.address = address;
-      this.assetCount = assetCount;
+    }: RAMMSuiPoolConfig) {
 
-      this.suiClient = suiClient;
+        if (assetConfigs.length !== assetCount) {
+            throw new Error("RAMMSuiPool: asset count differs from number of assets provided")
+        }
 
-      this.assetAggregators = assetAggregators;
-      this.assetTypes = assetTypes;
-      this.assetTickers = assetTickers;
-      this.assetDecimalPlaces = assetDecimalPlaces;
-      this.lpTokensDecimalPlaces = lpTokensDecimalPlaces;
+        this.name = name;
+        this.packageId = packageId;
+        this.address = address;
+        this.assetCount = assetCount;
 
-      this.delta = delta;
-      this.baseFee = baseFee;
-      this.baseLeverage = baseLeverage;
-      this.protocolFee = protocolFee;
+        this.suiClient = suiClient;
+
+        this.assetConfigs = assetConfigs;
+
+        this.delta = delta;
+        this.baseFee = baseFee;
+        this.baseLeverage = baseLeverage;
+        this.protocolFee = protocolFee;
     }
 }
