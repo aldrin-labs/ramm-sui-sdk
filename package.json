@@ -9,5 +9,14 @@
     "private": false,
     "dependencies": {
         "@mysten/sui.js": "^0.49.1"
+    },
+    "compilerOptions": {
+        "module": "node16",
+        "target": "es2023",
+        "strict": true,
+        "verbatimModuleSyntax": true,
+        "declaration": true,
+        "sourceMap": true,
+        "declarationMap": true
     }
 }
