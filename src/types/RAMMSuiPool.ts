@@ -1,5 +1,4 @@
 import { SuiClient } from '@mysten/sui.js/client';
-import { Keypair } from '@mysten/sui.js/cryptography';
 import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
 
 export class AssetConfig {
@@ -150,17 +149,21 @@ export class RAMMSuiPool {
 
     /**
      * Performs a liquidity deposit into a Sui RAMM pool.
+     *
+     * The returned transaction for the liquidity deposit can be created and signed using a
+     * keypair, and then sent to the Sui network for execution.
+     *
      * @param assetIn The Sui Move type of the asset going into the pool.
      * @param globalClock The address of the Sui network's global clock.
      * @param amountIn Object ID of the coin object with the amount to deposit into the pool.
      * @param signer The keypair used to sign and execute the transaction block.
+     * @returns The transaction block containing the liquidity deposit.
      */
-    async liquidityDeposit(
+    liquidityDeposit(
         assetIn: string,
         globalClock: string,
         amountIn: string,
-        signer: Keypair,
-    ) {
+    ): TransactionBlock {
         const txb = new TransactionBlock();
 
         const rammObj: TransactionObjectArgument = txb.object(this.address);
@@ -188,6 +191,8 @@ export class RAMMSuiPool {
             typeArguments: [
                 assetIn,
             ].concat(otherAssetTypes),
-        })
+        });
+
+        return txb
     }
 }
