@@ -19,10 +19,6 @@ export class AssetConfig {
      */
     assetDecimalPlaces: number;
     /**
-     * The decimal place count of an asset's LP token.
-     */
-    lpTokenDecimalPlaces: number;
-    /**
      * An asset's minimum trade amount, specified with the asset's decimal place count.
      */
     minimumTradeAmount: number;
