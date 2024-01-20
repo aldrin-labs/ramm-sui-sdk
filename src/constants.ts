@@ -14,9 +14,9 @@ export const suiConfigs: SuiNetworkConfigs = {
             assetCount: 3,
 
             assetTypeIndices: new Map([
-                ['BTC', 0],
-                ['ETH', 1],
-                ['SOL', 2],
+                ['0x303e80a2d9dc0a2cbb6fc612d1f5cdc250420ea9e87488232f3ebc5d27e645d6::test_coins::BTC', 0],
+                ['0x303e80a2d9dc0a2cbb6fc612d1f5cdc250420ea9e87488232f3ebc5d27e645d6::test_coins::ETH', 1],
+                ['0x303e80a2d9dc0a2cbb6fc612d1f5cdc250420ea9e87488232f3ebc5d27e645d6::test_coins::SOL', 2],
             ]),
             assetConfigs: [
                 {

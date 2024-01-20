@@ -3,6 +3,10 @@
     "version": "1.0.0",
     "description": "TypeScript SDK for the Sui Move RAMM",
     "main": "index.ts",
+    "scripts": {
+        "build:sdk": "tsup ./index.ts --format cjs,esm --dts --clean",
+        "test": "vitest"
+    },
     "repository": "https://github.com/aldrin-labs/ramm-sui-sdk.git",
     "author": "Alexandre Baldé <alexandre@aldrin.com>",
     "license": "AGPL-3.0",
@@ -18,5 +22,9 @@
         "declaration": true,
         "sourceMap": true,
         "declarationMap": true
+    },
+    "devDependencies": {
+        "tsup": "^8.0.1",
+        "vitest": "^1.2.1"
     }
 }
