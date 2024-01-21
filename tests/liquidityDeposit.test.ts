@@ -1,9 +1,10 @@
 import { suiConfigs } from "../src/constants";
 import { RAMMSuiPoolConfig, RAMMSuiPool } from "../src/types";
+import { testKeypair } from "./config";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+import { Secp256r1Keypair } from '@mysten/sui.js/keypairs/secp256r1';
 import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
 
 import {describe, expect, test} from 'vitest';
@@ -20,6 +21,11 @@ const sleep = (ms: number) => {
 
 describe('Liquidity deposit', () => {
     test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a BTC/ETH/RAMM pool', async () => {
+        /**
+         * Create a Sui client, and retrieve an existing and initialized RAMM pool from
+         * the configs provided in the library.
+         */
+
         // use `getFullnodeUrl` to query the testnet's RPC location
         const rpcUrl = getFullnodeUrl(TESTNET);
         // create a client connected to the testnet
@@ -30,40 +36,25 @@ describe('Liquidity deposit', () => {
             throw new Error('Sui Testnet config not found!');
         }
 
-        /**
-         *
-        */
-
         const poolConfig = suiTestnet[0];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig, suiClient);
 
         console.log(ramm);
 
-        // random Keypair
-        const keypair = new Ed25519Keypair();
-
-        console.log('Using generated address:' + keypair.toSuiAddress());
+        /**
+         * Request SUI from the testnet's faucet.
+        */
 
         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
-            recipient: keypair.toSuiAddress(),
+            recipient: testKeypair.toSuiAddress(),
         });
 
         // Wait for the network to register the SUI faucet transaction.
-        await sleep(3000);
-
-
-        await ramm
-            .suiClient
-            .getCoins({owner: keypair.toSuiAddress()})
-            .then(
-                (paginatedCoins) => {
-                    console.log('SUI coin from faucet: ' + paginatedCoins.data[0]);
-            });
-
+        await sleep(600);
 
         /**
-         *
+         * Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
         */
 
         let txb = new TransactionBlock();
@@ -73,10 +64,10 @@ describe('Liquidity deposit', () => {
         txb.moveCall({
             target: `${RAMM_MISC_PKG_ID}::test_coin_faucet::mint_test_coins`,
             arguments: [txb.object(TOKEN_FAUCET_ID), txb.pure(btc_amount)],
-            typeArguments: [`${TOKEN_FAUCET_ID}::test_coins::BTC`]
+            typeArguments: [`${RAMM_MISC_PKG_ID}::test_coins::BTC`]
         });
 
-        let response = await ramm.suiClient.signAndExecuteTransactionBlock({signer: keypair, transactionBlock: txb});
+        let response = await ramm.suiClient.signAndExecuteTransactionBlock({signer: testKeypair, transactionBlock: txb});
 
         console.log(response);
     });
