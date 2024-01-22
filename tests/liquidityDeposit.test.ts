@@ -21,7 +21,7 @@ const sleep = (ms: number) => {
 }
 
 describe('Liquidity deposit', () => {
-    test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a BTC/ETH/RAMM pool', async () => {
+    test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a ADA/DOT/SOL RAMM pool', async () => {
         /**
          * Create a Sui client, and retrieve an existing and initialized RAMM pool from
          * the configs provided in the library.
@@ -59,20 +59,20 @@ describe('Liquidity deposit', () => {
         */
 
         let txb = new TransactionBlock();
-        let btc_type: string = `${RAMM_MISC_PKG_ID}::test_coins::BTC`;
+        let adaType: string = `${RAMM_MISC_PKG_ID}::test_coins::ADA`;
 
-        // BTC has 8 decimal places, so this is 0.01 BTC.
-        let btc_amount: number = 1_000_000;
+        // ADA has 8 decimal places, so this is 1 ADA.
+        let adaAmount: number = 100_000_000;
         txb.moveCall({
             target: `${RAMM_MISC_PKG_ID}::test_coin_faucet::mint_test_coins`,
-            arguments: [txb.object(TOKEN_FAUCET_ID), txb.pure(btc_amount)],
-            typeArguments: [btc_type]
+            arguments: [txb.object(TOKEN_FAUCET_ID), txb.pure(adaAmount)],
+            typeArguments: [adaType]
         });
 
-        //await suiClient.signAndExecuteTransactionBlock({signer: testKeypair, transactionBlock: txb});
+        await suiClient.signAndExecuteTransactionBlock({signer: testKeypair, transactionBlock: txb});
 
         // Wait for the network to register the test token request.
-        await sleep(1000);
+        await sleep(600);
 
         /**
          * Perform the liquidity deposit using the SDK
@@ -80,17 +80,17 @@ describe('Liquidity deposit', () => {
 
         let paginatedCoins = await suiClient.getCoins({
             owner: testKeypair.toSuiAddress(),
-            coinType: btc_type,
+            coinType: adaType,
         });
         //console.log(paginatedCoins);
 
-        // Choose any of the test BTC coins the wallet may already have.
-        let btcId = paginatedCoins.data[0].coinObjectId;
+        // Choose any of the test ADA coins the wallet may already have.
+        let adaId = paginatedCoins.data[0].coinObjectId;
 
         let liqDepTxb = ramm.liquidityDeposit({
-            assetIn: btc_type,
+            assetIn: adaType,
             globalClock: SUI_CLOCK_OBJECT_ID,
-            amountIn: btcId
+            amountIn: adaId
         });
 
         console.log(liqDepTxb.blockData.transactions);

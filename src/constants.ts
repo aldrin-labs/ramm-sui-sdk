@@ -8,9 +8,9 @@ export const suiConfigs: SuiNetworkConfigs = {
     suiTestnet: [
         {
             name: 'Sui Testnet ADA/DOT/SOL RAMM',
-            packageId: '0xf0672ec8467d7e9d734473a050d4391b8d77956960e40c03a60f9fef9203295a',
+            packageId: '0x71842d2b44e795901b99be7ba1d9db524ee5df6674cc0270088db4e95166dd89',
             moduleName: 'ramm',
-            address: '0xc4e38fecee86530bd2e2b72527ab128307838d4760b00edd246fc54a7e3fd216',
+            address: '0xab90449e8d5322d964d758a81f31d5491b8da28455f0e840aca1c8868379c2be',
             assetCount: 3,
 
             assetTypeIndices: new Map([
@@ -20,14 +20,14 @@ export const suiConfigs: SuiNetworkConfigs = {
             ]),
             assetConfigs: [
                 {
-                    assetAggregator: '0x7c30e48db7dfd6a2301795be6cb99d00c87782e2547cf0c63869de244cfc7e47',
+                    assetAggregator: '0xde1e536f6938c718bdaa055e75ae50ec3fa6691726b3a3b897c691355793ede6',
                     assetType: '0x937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b::test_coins::ADA',
                     assetTicker: 'ADA',
                     assetDecimalPlaces: 8,
                     minimumTradeAmount: 100_000_000,
                 },
                 {
-                    assetAggregator: '0x68ed81c5dd07d12c629e5cdad291ca004a5cd3708d5659cb0b6bfe983e14778c',
+                    assetAggregator: '0xa6c61dae96bcae8944ca1365f943b44a2def64a3e1ae291eef76879868e157c7',
                     assetType: '0x937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b::test_coins::DOT',
                     assetTicker: 'DOT',
                     assetDecimalPlaces: 8,
