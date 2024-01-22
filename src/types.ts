@@ -1,5 +1,5 @@
-import { SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
+import { create } from 'domain';
 
 export class AssetConfig {
     /**
@@ -69,11 +69,6 @@ export class RAMMSuiPool {
      */
     readonly assetCount: number;
 
-    /**
-     * Sui Client used to build PTBs with which to interact with the RAMM.
-     */
-    suiClient: SuiClient;
-
     assetTypeIndices: Map<string, number>;
     /**
      * Metadata for each of the pool's assets.
@@ -119,7 +114,6 @@ export class RAMMSuiPool {
             baseLeverage = 100,
             protocolFee = 0.5
         }: RAMMSuiPoolConfig,
-        suiClient: SuiClient
     ) {
 
         if (assetConfigs.length !== assetCount) {
@@ -132,7 +126,6 @@ export class RAMMSuiPool {
         this.address = address;
         this.assetCount = assetCount;
 
-        this.suiClient = suiClient;
 
         this.assetTypeIndices = assetTypeIndices;
         this.assetConfigs = assetConfigs;
@@ -155,37 +148,40 @@ export class RAMMSuiPool {
      * @param signer The keypair used to sign and execute the transaction block.
      * @returns The transaction block containing the liquidity deposit.
      */
-    liquidityDeposit(
+    liquidityDeposit(param: {
         assetIn: string,
         globalClock: string,
         amountIn: string,
-    ): TransactionBlock {
+    }): TransactionBlock {
         const txb = new TransactionBlock();
 
-        const rammObj: TransactionObjectArgument = txb.object(this.address);
-        const globalClockObj: TransactionObjectArgument = txb.object(globalClock);
-        const amountInObj: TransactionObjectArgument = txb.object(amountIn);
-        let assetAggregators: TransactionObjectArgument[] = this.assetConfigs.map(
-            (assetConfig) => txb.object(assetConfig.assetAggregator)
+        let assetAggregators = this.assetConfigs.map(
+            (assetConfig) => {
+                let str = assetConfig.assetAggregator;
+                return txb.object(str);
+            }
         );
-        const assetInIndex: number  = this.assetTypeIndices.get(assetIn);
-        const assetInAggregator = assetAggregators.splice(assetInIndex, 1);
-        let otherAssetTypes: string[] = this
+
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
+        const [assetInAggregator] = assetAggregators.splice(assetInIndex, 1);
+
+        const otherAssetTypes: string[] = this
             .assetConfigs
             .map(
                 (assetConfig) => assetConfig.assetType
-            )
-            .splice(assetInIndex, 1);
+            );
+        otherAssetTypes.splice(assetInIndex, 1);
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::liquidity_deposit_${this.assetCount}`,
             arguments: [
                 txb.object(this.address),
-                txb.object(globalClock),
-                txb.object(amountIn),
+                txb.object(param.globalClock),
+                txb.object(param.amountIn),
+                assetInAggregator
             ].concat(assetAggregators),
             typeArguments: [
-                assetIn,
+                param.assetIn,
             ].concat(otherAssetTypes),
         });
 
