@@ -2,6 +2,8 @@ import { Secp256r1Keypair } from '@mysten/sui.js/keypairs/secp256r1';
 
 require('dotenv').config();
 
+export const TESTNET: "testnet" | "devnet" | "localnet" = 'testnet';
+
 /**
  * Read this repository's `.env` file, and return the `Secp256r1Keypair` associated with the
  * `.env`'s `PRIVATE_KEY` field.
@@ -30,6 +32,40 @@ const getKeypair = function (): Secp256r1Keypair {
  * Keypair to be used for tests. It's a testnet keypair, with plenty of SUI.
  */
 export const testKeypair = getKeypair();
+
+/**
+ * Data related to the test coin faucet from the `ramm-misc` package, to be used in tests.
+ */
+export type RAMMMiscFaucet = {
+    /**
+     * Package ID of the published `ramm-misc` Sui Move package
+     */
+    packageId: string,
+
+    /**
+     * Name of the module from `ramm-misc` containing the API to interact with the faucet.
+     */
+    faucetModule: string,
+
+    /**
+     * Name of the module from `ramm-misc` containing the test coin types.
+     */
+    testCoinsModule: string,
+
+    /**
+     * Address of the faucet currently deployed on the Sui testnet, from which to obtain tokens
+     * to interact with RAMMs.
+     */
+    faucetAddress: string,
+}
+
+export const rammMiscFaucet: RAMMMiscFaucet = {
+    packageId: '0x937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b',
+    faucetModule: 'test_coin_faucet',
+    testCoinsModule: 'test_coins',
+
+    faucetAddress: `0x61fc830d05a3f0f7fee6d601cd88023fe5d39d52dc8028e8530bf60f46d8f784`,
+}
 
 /**
  * Structure representing the parsed JSON of the Sui Move event for a liquidity deposit, used in

@@ -1,19 +1,16 @@
 import { suiConfigs } from "../src/constants";
-import { RAMMSuiPoolConfig, RAMMSuiPool } from "../src/types";
-import { testKeypair, LiquidityDepositEvent } from "./utils";
+import { RAMMSuiPool } from "../src/types";
+import {
+    LiquidityDepositEvent, RAMMMiscFaucet,
+    TESTNET,
+    rammMiscFaucet, testKeypair
+} from "./utils";
 
-import { getFullnodeUrl, PaginatedCoins, SuiClient, SuiEvent } from '@mysten/sui.js/client';
+import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
-import { Secp256r1Keypair } from '@mysten/sui.js/keypairs/secp256r1';
-import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-import {assert, describe, expect, test} from 'vitest';
-
-const TESTNET: "testnet" | "devnet" | "localnet" = 'testnet';
-
-const RAMM_MISC_PKG_ID = '0x937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b';
-
-const TOKEN_FAUCET_ID = `0x61fc830d05a3f0f7fee6d601cd88023fe5d39d52dc8028e8530bf60f46d8f784`;
+import { assert, describe, test } from 'vitest';
 
 const sleep = (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -46,7 +43,7 @@ describe('Liquidity deposit', () => {
          * Request SUI from the testnet's faucet.
         */
 
-         await requestSuiFromFaucetV1({
+        await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
             recipient: testKeypair.toSuiAddress(),
         });
@@ -59,17 +56,17 @@ describe('Liquidity deposit', () => {
         */
 
         let txb = new TransactionBlock();
-        let btcType: string = `${RAMM_MISC_PKG_ID}::test_coins::BTC`;
+        let btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`;
 
         // BTC has 8 decimal places, so this is 0.01 BTC.
         let btcAmount: number = 1_000_000;
         txb.moveCall({
-            target: `${RAMM_MISC_PKG_ID}::test_coin_faucet::mint_test_coins`,
-            arguments: [txb.object(TOKEN_FAUCET_ID), txb.pure(btcAmount)],
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins`,
+            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
             typeArguments: [btcType]
         });
 
-        await suiClient.signAndExecuteTransactionBlock({signer: testKeypair, transactionBlock: txb});
+        await suiClient.signAndExecuteTransactionBlock({ signer: testKeypair, transactionBlock: txb });
 
         // Wait for the network to register the test token request.
         await sleep(600);
