@@ -139,14 +139,12 @@ export class RAMMSuiPool {
     /**
      * Performs a liquidity deposit into a Sui RAMM pool.
      *
-     * The returned transaction for the liquidity deposit can be created and signed using a
-     * keypair, and then sent to the Sui network for execution.
+     * The returned transaction for the liquidity deposit can signed using a TS SDK keypair, and
+     * then sent to the Sui network for execution.
      *
      * @param assetIn The Sui Move type of the asset going into the pool.
-     * @param globalClock The address of the Sui network's global clock.
-     * @param amountIn Object ID of the coin object with the amount to deposit into the pool.
-     * @param signer The keypair used to sign and execute the transaction block.
-     * @returns The transaction block containing the liquidity deposit.
+     * @param amountIn ID of the coin object with the amount to deposit into the pool.
+     * @returns The transaction block containing the liquidity deposit `moveCall`.
      */
     liquidityDeposit(param: {
         assetIn: string,
@@ -182,6 +180,49 @@ export class RAMMSuiPool {
             typeArguments: [
                 param.assetIn,
             ].concat(otherAssetTypes),
+        });
+
+        return txb
+    }
+
+    /**
+     * Performs a liquidity withdrawal from a Sui RAMM pool.
+     *
+     * The returned transaction for the liquidity withdrawal can be signed using a TS SDK keypair,
+     * and then sent to the Sui network for execution.
+     *
+     * @param assetOut The Sui Move type of the asset being withdrawn from the pool.
+     * @param lpToken ID of the coin object with the LP tokens to redeem from the pool.
+     * @returns The transaction block containing the liquidity withdrawal `moveCall`.
+     */
+    liquidityWithdrawal(param: {
+        assetOut: string,
+        lpToken: string,
+    }): TransactionBlock {
+        const txb = new TransactionBlock();
+
+        let assetAggregators = this.assetConfigs.map(
+            (assetConfig) => {
+                let str = assetConfig.assetAggregator;
+                return txb.object(str);
+            }
+        );
+
+        let assetTypes: string[] = this
+            .assetConfigs
+            .map(
+                (assetConfig) => assetConfig.assetType
+            );
+        assetTypes.push(param.assetOut);
+
+        txb.moveCall({
+            target: `${this.packageId}::interface${this.assetCount}::liquidity_withdrawal_${this.assetCount}`,
+            arguments: [
+                txb.object(this.address),
+                txb.object(SUI_CLOCK_OBJECT_ID),
+                txb.object(param.lpToken),
+            ].concat(assetAggregators),
+            typeArguments: assetTypes.concat(param.assetOut)
         });
 
         return txb
