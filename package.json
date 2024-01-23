@@ -25,7 +25,6 @@
         "declarationMap": true
     },
     "devDependencies": {
-        "@mysten/bcs": "^0.10.1",
         "@types/node": "^20.11.5",
         "tsup": "^8.0.1",
         "vitest": "^1.2.1"

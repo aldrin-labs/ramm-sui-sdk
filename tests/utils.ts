@@ -30,3 +30,17 @@ const getKeypair = function (): Secp256r1Keypair {
  * Keypair to be used for tests. It's a testnet keypair, with plenty of SUI.
  */
 export const testKeypair = getKeypair();
+
+/**
+ * Structure representing the parsed JSON of the Sui Move event for a liquidity deposit, used in
+ * tests.
+ */
+export type LiquidityDepositEvent = {
+    ramm_id: string,
+    trader: string,
+    token_in: {
+        name: string
+    },
+    amount_in: number,
+    lpt: number,
+}

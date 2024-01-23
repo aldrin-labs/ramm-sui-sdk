@@ -1,15 +1,13 @@
-import { BCS, bcs, fromB58, fromHEX, toHEX } from '@mysten/bcs';
-
 import { suiConfigs } from "../src/constants";
 import { RAMMSuiPoolConfig, RAMMSuiPool } from "../src/types";
-import { testKeypair } from "./config";
+import { testKeypair, LiquidityDepositEvent } from "./utils";
 
 import { getFullnodeUrl, PaginatedCoins, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { Secp256r1Keypair } from '@mysten/sui.js/keypairs/secp256r1';
 import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
 
-import {describe, expect, test} from 'vitest';
+import {assert, describe, expect, test} from 'vitest';
 
 const TESTNET: "testnet" | "devnet" | "localnet" = 'testnet';
 
@@ -103,52 +101,14 @@ describe('Liquidity deposit', () => {
             }
         });
 
-        const TypeName = bcs.struct('TypeName', {
-            name: bcs.string()
-        });
-
-        const ID = bcs.fixedArray(32, bcs.u8()).transform({
-            input: (id: string) => fromHEX(id),
-            output: (id) => toHEX(id),
-        });
-
-        const LiquidityDepositEvent = bcs.struct('LiquidityDepositEvent', {
-            ramm_id: bcs.string(),
-            trader: bcs.string(),
-            token_in: TypeName,
-            amount_in: bcs.u64(),
-            lpt: bcs.u64()
-        });
-
-        const struct = LiquidityDepositEvent.serialize({
-                ramm_id: '0xbd08e351fdece13104b35fc83ce1cc8584cc992d39cc6663d4cd4a5b5afaa0c7',
-                trader: '0x899b0e93970b774c2f007485f5812671eff5c84549741c76fc900e9aab857965',
-                token_in: {
-                    name: '937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b::test_coins::BTC'
-                },
-                amount_in: 1000000,
-                lpt: 1000000
-        }).toBase58();
-
-        console.log('base58 event: ' + struct);
-
         const liqDepEvent = resp.events![0] as SuiEvent;
+        const liqDepEventJSON = liqDepEvent.parsedJson as LiquidityDepositEvent;
 
-        console.log('liq dep event: ' + JSON.stringify(liqDepEvent, null, 4));
+        assert.equal(liqDepEventJSON.ramm_id, ramm.address);
+        assert.equal(liqDepEventJSON.amount_in, btcAmount);
+        assert.equal(liqDepEventJSON.lpt, btcAmount);
+        assert.equal('0x' + liqDepEventJSON.token_in.name, btcType);
+        assert.equal(liqDepEventJSON.trader, testKeypair.toSuiAddress());
 
-        const liqDepEventStr = fromB58(liqDepEvent.bcs);
-
-        const parsedStruct = LiquidityDepositEvent.parse(fromB58(struct));
-        console.log('parsed liq dep event: ' + JSON.stringify(parsedStruct, null, 4));  
-
-        return
-
-        const parsedLidDepEvent = LiquidityDepositEvent.parse(liqDepEventStr);
-        console.log(parsedLidDepEvent);
-
-        console.log(
-            'Events from test token faucet tx\'s response: ' +
-            JSON.stringify(resp.events, null, 4)
-        );
-    }, /** timeout for the test, in ms */ 15_000);
+    }, /** timeout for the test, in ms */ 10_000);
 });
