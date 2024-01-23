@@ -168,7 +168,7 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mysten/bcs@0.10.1":
+"@mysten/bcs@0.10.1", "@mysten/bcs@^0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@mysten/bcs/-/bcs-0.10.1.tgz#8c6b7667541c58b5e90fc20b531529d21c81be18"
   integrity sha512-cQDb7Rhz2J82ZqgVQiHykuwKUlgiLWS2bjoajPPW0uvXlb75qrgKuaxh1UzsaRhHy3egk/APc0xjiZoqdbzB4w==

@@ -1,9 +1,10 @@
+import { BCS, bcs, fromB58, fromHEX, toHEX } from '@mysten/bcs';
+
 import { suiConfigs } from "../src/constants";
 import { RAMMSuiPoolConfig, RAMMSuiPool } from "../src/types";
 import { testKeypair } from "./config";
 
-import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
-import { getFullnodeUrl, PaginatedCoins, SuiClient } from '@mysten/sui.js/client';
+import { getFullnodeUrl, PaginatedCoins, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { Secp256r1Keypair } from '@mysten/sui.js/keypairs/secp256r1';
 import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
@@ -21,7 +22,7 @@ const sleep = (ms: number) => {
 }
 
 describe('Liquidity deposit', () => {
-    test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a ADA/DOT/SOL RAMM pool', async () => {
+    test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a BTC/ETH/SOL RAMM pool', async () => {
         /**
          * Create a Sui client, and retrieve an existing and initialized RAMM pool from
          * the configs provided in the library.
@@ -37,7 +38,8 @@ describe('Liquidity deposit', () => {
             throw new Error('Sui Testnet config not found!');
         }
 
-        const poolConfig = suiTestnet[0];
+        // Select the BTC/ETH/SOL RAMM
+        const poolConfig = suiTestnet[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
         console.log(ramm);
@@ -46,11 +48,11 @@ describe('Liquidity deposit', () => {
          * Request SUI from the testnet's faucet.
         */
 
-/*         await requestSuiFromFaucetV1({
+         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
             recipient: testKeypair.toSuiAddress(),
         });
- */
+
         // Wait for the network to register the SUI faucet transaction.
         await sleep(600);
 
@@ -59,14 +61,14 @@ describe('Liquidity deposit', () => {
         */
 
         let txb = new TransactionBlock();
-        let adaType: string = `${RAMM_MISC_PKG_ID}::test_coins::ADA`;
+        let btcType: string = `${RAMM_MISC_PKG_ID}::test_coins::BTC`;
 
-        // ADA has 8 decimal places, so this is 1 ADA.
-        let adaAmount: number = 100_000_000;
+        // BTC has 8 decimal places, so this is 0.01 BTC.
+        let btcAmount: number = 1_000_000;
         txb.moveCall({
             target: `${RAMM_MISC_PKG_ID}::test_coin_faucet::mint_test_coins`,
-            arguments: [txb.object(TOKEN_FAUCET_ID), txb.pure(adaAmount)],
-            typeArguments: [adaType]
+            arguments: [txb.object(TOKEN_FAUCET_ID), txb.pure(btcAmount)],
+            typeArguments: [btcType]
         });
 
         await suiClient.signAndExecuteTransactionBlock({signer: testKeypair, transactionBlock: txb});
@@ -80,22 +82,73 @@ describe('Liquidity deposit', () => {
 
         let paginatedCoins = await suiClient.getCoins({
             owner: testKeypair.toSuiAddress(),
-            coinType: adaType,
+            coinType: btcType,
         });
         //console.log(paginatedCoins);
 
-        // Choose any of the test ADA coins the wallet may already have.
-        let adaId = paginatedCoins.data[0].coinObjectId;
+        // Choose any of the test BTC coins the wallet may already have.
+        let btcId = paginatedCoins.data[0].coinObjectId;
 
         let liqDepTxb = ramm.liquidityDeposit({
-            assetIn: adaType,
-            globalClock: SUI_CLOCK_OBJECT_ID,
-            amountIn: adaId
+            assetIn: btcType,
+            amountIn: btcId
         });
 
-        console.log(liqDepTxb.blockData.transactions);
+        let resp = await suiClient.signAndExecuteTransactionBlock({
+            signer: testKeypair,
+            transactionBlock: liqDepTxb,
+            options: {
+                // required, so that we can scrutinize the response's events for a liq. dep.
+                showEvents: true
+            }
+        });
 
-        let resp = await suiClient.signAndExecuteTransactionBlock({signer: testKeypair, transactionBlock: liqDepTxb});
-        console.log('Events from test token faucet tx\'s response: ' + resp.events);
-    });
+        const TypeName = bcs.struct('TypeName', {
+            name: bcs.string()
+        });
+
+        const ID = bcs.fixedArray(32, bcs.u8()).transform({
+            input: (id: string) => fromHEX(id),
+            output: (id) => toHEX(id),
+        });
+
+        const LiquidityDepositEvent = bcs.struct('LiquidityDepositEvent', {
+            ramm_id: bcs.string(),
+            trader: bcs.string(),
+            token_in: TypeName,
+            amount_in: bcs.u64(),
+            lpt: bcs.u64()
+        });
+
+        const struct = LiquidityDepositEvent.serialize({
+                ramm_id: '0xbd08e351fdece13104b35fc83ce1cc8584cc992d39cc6663d4cd4a5b5afaa0c7',
+                trader: '0x899b0e93970b774c2f007485f5812671eff5c84549741c76fc900e9aab857965',
+                token_in: {
+                    name: '937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b::test_coins::BTC'
+                },
+                amount_in: 1000000,
+                lpt: 1000000
+        }).toBase58();
+
+        console.log('base58 event: ' + struct);
+
+        const liqDepEvent = resp.events![0] as SuiEvent;
+
+        console.log('liq dep event: ' + JSON.stringify(liqDepEvent, null, 4));
+
+        const liqDepEventStr = fromB58(liqDepEvent.bcs);
+
+        const parsedStruct = LiquidityDepositEvent.parse(fromB58(struct));
+        console.log('parsed liq dep event: ' + JSON.stringify(parsedStruct, null, 4));  
+
+        return
+
+        const parsedLidDepEvent = LiquidityDepositEvent.parse(liqDepEventStr);
+        console.log(parsedLidDepEvent);
+
+        console.log(
+            'Events from test token faucet tx\'s response: ' +
+            JSON.stringify(resp.events, null, 4)
+        );
+    }, /** timeout for the test, in ms */ 15_000);
 });

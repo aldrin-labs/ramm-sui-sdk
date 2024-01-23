@@ -1,5 +1,5 @@
 import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
-import { create } from 'domain';
+import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 
 export class AssetConfig {
     /**
@@ -150,7 +150,6 @@ export class RAMMSuiPool {
      */
     liquidityDeposit(param: {
         assetIn: string,
-        globalClock: string,
         amountIn: string,
     }): TransactionBlock {
         const txb = new TransactionBlock();
@@ -176,7 +175,7 @@ export class RAMMSuiPool {
             target: `${this.packageId}::interface${this.assetCount}::liquidity_deposit_${this.assetCount}`,
             arguments: [
                 txb.object(this.address),
-                txb.object(param.globalClock),
+                txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.object(param.amountIn),
                 assetInAggregator
             ].concat(assetAggregators),
