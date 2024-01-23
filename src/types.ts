@@ -201,7 +201,7 @@ export class RAMMSuiPool {
     }): TransactionBlock {
         const txb = new TransactionBlock();
 
-        let assetAggregators = this.assetConfigs.map(
+        const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
                 return txb.object(str);
@@ -222,7 +222,7 @@ export class RAMMSuiPool {
                 txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.object(param.lpToken),
             ].concat(assetAggregators),
-            typeArguments: assetTypes.concat(param.assetOut)
+            typeArguments: assetTypes
         });
 
         return txb

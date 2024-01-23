@@ -2,6 +2,15 @@ import { Secp256r1Keypair } from '@mysten/sui.js/keypairs/secp256r1';
 
 require('dotenv').config();
 
+/**
+ * Sleep function, to wait for state changes to propagate throughout the testnet.
+ * @param ms Milliseconds to sleep for.
+ * @returns a `Promise` which, when `await`ed, resolves after `ms` milliseconds.
+ */
+export const sleep = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const TESTNET: "testnet" | "devnet" | "localnet" = 'testnet';
 
 /**
@@ -67,6 +76,10 @@ export const rammMiscFaucet: RAMMMiscFaucet = {
     faucetAddress: `0x61fc830d05a3f0f7fee6d601cd88023fe5d39d52dc8028e8530bf60f46d8f784`,
 }
 
+type TypeName = {
+    name: string
+}
+
 /**
  * Structure representing the parsed JSON of the Sui Move event for a liquidity deposit, used in
  * tests.
@@ -74,9 +87,29 @@ export const rammMiscFaucet: RAMMMiscFaucet = {
 export type LiquidityDepositEvent = {
     ramm_id: string,
     trader: string,
-    token_in: {
-        name: string
-    },
+    token_in: TypeName,
     amount_in: number,
     lpt: number,
+}
+
+type LiqWthdrwDict = {
+    key: TypeName,
+    value: number,
+}
+
+type Contents = {
+    contents: LiqWthdrwDict[],
+}
+
+/**
+ * Structure representing the parsed JSON of the Sui Move event for a liquidity deposit, used in
+ * tests.
+ */
+export type LiquidityWithdrawalEvent = {
+    ramm_id: string,
+    trader: string,
+    token_out: TypeName,
+    lpt: number,
+    amounts_out: Contents,
+    fees: Contents
 }
