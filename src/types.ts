@@ -236,9 +236,9 @@ export class RAMMSuiPool {
      * @param param.amountIn ID of the coin object with the amount to deposit into the pool.
      * @param param.minAmountOut The minimum amount the trade is willing to receive in their
      * trade.
-     * @returns The transaction block containing the ingoing trade's `moveCall`.
+     * @returns The transaction block containing the "sell" trade's `moveCall`.
      */
-    trade_amount_in(param: {
+    tradeAmountIn(param: {
         assetIn: string,
         assetOut: string,
         amountIn: string,
@@ -277,6 +277,68 @@ export class RAMMSuiPool {
                 txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.object(param.amountIn),
                 txb.pure(param.minAmountOut),
+                assetInAggregator,
+                assetOutAggregator,
+            ].concat(assetAggregators),
+            typeArguments: [
+                param.assetIn,
+                param.assetOut,
+            ].concat(otherAssetTypes),
+        });
+
+        return txb
+    }
+
+    /**
+     * Create a PTB to perform a "buy" trade on a Sui RAMM pool.
+     *
+     * @param param.assetIn The Sui Move type of the asset going into the pool.
+     * @param param.assetOut The Sui Move type of the asset coming out of the pool.
+     * @param param.amountOut The trader's exact desired amount of the outgoing asset.
+     * @param param.maxAmountIn The ID of a coin object whose amount is the most the trade is
+     * willing to deposit.
+     * trade.
+     * @returns The transaction block containing the "buy" trade's `moveCall`.
+     */
+    tradeAmountOut(param: {
+        assetIn: string,
+        assetOut: string,
+        amountOut: number,
+        maxAmountIn: string,
+    }): TransactionBlock {
+        const txb = new TransactionBlock();
+
+        let assetAggregators = this.assetConfigs.map(
+            (assetConfig) => {
+                let str = assetConfig.assetAggregator;
+                return txb.object(str);
+            }
+        );
+
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
+        const [assetInAggregator] = assetAggregators.splice(assetInIndex, 1);
+
+        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
+        const [assetOutAggregator] = assetAggregators.splice(assetOutIndex, 1);
+
+        // recall that assetAggregators is now missing the assetIn and assetOut aggregators.
+
+        const otherAssetTypes: string[] = this
+            .assetConfigs
+            .map(
+                (assetConfig) => assetConfig.assetType
+            )
+            .filter(
+                (assetType) => assetType !== param.assetIn && assetType !== param.assetOut
+            );
+
+        txb.moveCall({
+            target: `${this.packageId}::interface${this.assetCount}::trade_amount_out_${this.assetCount}`,
+            arguments: [
+                txb.object(this.address),
+                txb.object(SUI_CLOCK_OBJECT_ID),
+                txb.pure(param.amountOut),
+                txb.object(param.maxAmountIn),
                 assetInAggregator,
                 assetOutAggregator,
             ].concat(assetAggregators),
