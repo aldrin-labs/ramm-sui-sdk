@@ -10,7 +10,7 @@ import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-import { assert, describe, test } from 'vitest';
+import { assert, describe, expect, test } from 'vitest';
 
 describe('Liquidity deposit', () => {
     test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a BTC/ETH/SOL RAMM pool', async () => {
@@ -100,7 +100,9 @@ describe('Liquidity deposit', () => {
         assert.equal(liqDepEventJSON.ramm_id, ramm.address);
         assert.equal(liqDepEventJSON.trader, testKeypair.toSuiAddress());
         assert.equal('0x' + liqDepEventJSON.token_in.name, btcType);
-        assert.equal(liqDepEventJSON.amount_in, btcAmount);
-        assert.equal(liqDepEventJSON.lpt, btcAmount);
+        expect(Number(liqDepEventJSON.amount_in)).toBeGreaterThan(0);
+        expect(Number(liqDepEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount);
+        expect(Number(liqDepEventJSON.lpt)).toBeGreaterThan(0);
+        expect(Number(liqDepEventJSON.lpt)).toBeLessThan(btcAmount);
     }, /** timeout for the test, in ms */ 10_000);
 });

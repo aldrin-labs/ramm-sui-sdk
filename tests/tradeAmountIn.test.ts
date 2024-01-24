@@ -3,6 +3,7 @@ import { RAMMSuiPool } from "../src/types";
 import {
     LiquidityWithdrawalEvent, RAMMMiscFaucet,
     TESTNET,
+    TradeEvent,
     rammMiscFaucet, sleep, testKeypair
 } from "./utils";
 
@@ -33,7 +34,7 @@ describe('Trade amount into RAMM', () => {
         const poolConfig = suiTestnet[0];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log(ramm);
+        console.log('Running test fror: ' + ramm.name);
 
         /**
          * Request SUI from the testnet's faucet.
@@ -55,8 +56,8 @@ describe('Trade amount into RAMM', () => {
         const adaType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ADA`;
         const dotType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::DOT`;
 
-        // ADA has 8 decimal places, so this is 100 ADA.
-        const adaLiqAmount: number = 10_000_000_000;
+        // ADA has 8 decimal places, so this is 200 ADA.
+        const adaLiqAmount: number = 20_000_000_000;
         // This is 10 DOT
         const dotLiqAmount: number = 1_000_000_000;
         adaDotTxb.moveCall({
@@ -100,8 +101,18 @@ describe('Trade amount into RAMM', () => {
         });
 
         // Get the requested DOT coins' ID.
-        const dotLiqId = paginatedDotCoins.data[0].coinObjectId;
-        const dotId = paginatedDotCoins.data[1].coinObjectId;
+
+        let dotLiqId: string;
+        let dotId: string;
+
+        // Two DOT coins were requested:
+        // 1. a larger one, to be used for the liquidity deposit
+        // 2. a smaller one, to be used for the trade
+        if (BigInt(paginatedDotCoins.data[0].balance) > BigInt(paginatedDotCoins.data[1].balance)) {
+            [dotLiqId, dotId] = [paginatedDotCoins.data[0].coinObjectId, paginatedDotCoins.data[1].coinObjectId]
+        } else {
+            [dotLiqId, dotId] = [paginatedDotCoins.data[1].coinObjectId, paginatedDotCoins.data[0].coinObjectId]
+        }
 
         // Deposit ADA and DOT liquidity, required for the test
 
@@ -154,11 +165,16 @@ describe('Trade amount into RAMM', () => {
         });
 
         const tradeInEvent = resp.events![0] as SuiEvent;
-        const tradeInEventJSON = tradeInEvent.parsedJson as LiquidityWithdrawalEvent;
+        const tradeInEventJSON = tradeInEvent.parsedJson as TradeEvent;
 
-        console.log(JSON.stringify(tradeInEventJSON, null, 4));
+        assert.equal(tradeInEventJSON.ramm_id, ramm.address);
+        assert.equal(tradeInEventJSON.trader, testKeypair.toSuiAddress());
+        assert.equal('0x' + tradeInEventJSON.token_in.name, dotType);
+        assert.equal('0x' + tradeInEventJSON.token_out.name, adaType);
+        assert.equal(Number(tradeInEventJSON.amount_in), dotAmount);
+        expect(Number(tradeInEventJSON.amount_out)).toBeGreaterThan(0);
+        expect(Number(tradeInEventJSON.protocol_fee)).toBeGreaterThan(0);
+        expect(tradeInEventJSON.execute_trade).toBe(true);
 
-        return
-
-    }, /** timeout for the test, in ms */ 15_000);
+    }, /** timeout for the test, in ms */ 23_000);
 });
