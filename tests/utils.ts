@@ -81,8 +81,8 @@ type TypeName = {
 }
 
 /**
- * Structure representing the parsed JSON of the Sui Move event for a liquidity deposit, used in
- * tests.
+ * Structure representing the Sui Move event, in JSON, of a RAMM's liquidity deposit.
+ * Used in tests.
  */
 export type LiquidityDepositEvent = {
     ramm_id: string,
@@ -102,8 +102,8 @@ type Contents = {
 }
 
 /**
- * Structure representing the parsed JSON of the Sui Move event for a liquidity deposit, used in
- * tests.
+ * Structure representing the Sui Move event, in JSON, of a RAMM's liquidity withdrawal.
+ * Used in tests.
  */
 export type LiquidityWithdrawalEvent = {
     ramm_id: string,
@@ -112,4 +112,19 @@ export type LiquidityWithdrawalEvent = {
     lpt: number,
     amounts_out: Contents,
     fees: Contents
+}
+
+/**
+ * Structure representing the Sui Move event, in JSON, of a RAMM's inbound/outbound trades.
+ * Used in tests.
+ */
+export type TradeEvent = {
+    ramm_id: string,
+    trader: string,
+    token_in: TypeName,
+    token_out: TypeName,
+    amount_in: number,
+    amount_out: number,
+    protocol_fee: number,
+    execute_trade: boolean,
 }
