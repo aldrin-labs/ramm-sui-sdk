@@ -1,4 +1,4 @@
-import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
+import { Inputs, TransactionBlock, TransactionObjectArgument, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 
 export class AssetConfig {
@@ -233,19 +233,19 @@ export class RAMMSuiPool {
      *
      * @param param.assetIn The Sui Move type of the asset going into the pool.
      * @param param.assetOut The Sui Move type of the asset coming out of the pool.
-     * @param param.amountIn ID of the coin object with the amount to deposit into the pool.
+     * @param param.amountIn The coin object with the amount to deposit into the pool.
      * @param param.minAmountOut The minimum amount the trade is willing to receive in their
      * trade.
      * @returns The transaction block containing the "sell" trade's `moveCall`.
      */
-    tradeAmountIn(param: {
-        assetIn: string,
-        assetOut: string,
-        amountIn: string,
-        minAmountOut: number,
+    tradeAmountIn(
+        txb: TransactionBlock,
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountIn: TransactionObjectInput,
+            minAmountOut: number,
     }): TransactionBlock {
-        const txb = new TransactionBlock();
-
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
