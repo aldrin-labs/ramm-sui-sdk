@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "TypeScript SDK for the Sui Move RAMM",
     "main": "index.ts",
+    "type": "module",
     "scripts": {
         "build:sdk": "tsup ./index.ts --format cjs,esm --dts --clean",
         "test": "vitest"
