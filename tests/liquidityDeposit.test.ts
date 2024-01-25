@@ -89,7 +89,7 @@ describe('Liquidity deposit', () => {
             signer: testKeypair,
             transactionBlock: liqDepTxb,
             options: {
-                // required, so that we can scrutinize the response's events for a liq. dep.
+                // required, so that we can scrutinize the response's events for a trade
                 showEvents: true
             }
         });

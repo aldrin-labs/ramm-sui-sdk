@@ -254,12 +254,16 @@ export class RAMMSuiPool {
         );
 
         const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
-        const [assetInAggregator] = assetAggregators.splice(assetInIndex, 1);
+        const assetInAggregator = assetAggregators[assetInIndex];
 
         const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
-        const [assetOutAggregator] = assetAggregators.splice(assetOutIndex, 1);
+        const assetOutAggregator = assetAggregators[assetOutIndex];
 
-        // recall that assetAggregators is now missing the assetIn and assetOut aggregators.
+        assetAggregators = assetAggregators.filter(
+            (_, index) => index !== assetInIndex && index !== assetOutIndex
+        );
+
+        // notice that assetAggregators is now missing the assetIn and assetOut aggregators.
 
         const otherAssetTypes: string[] = this
             .assetConfigs
@@ -316,10 +320,14 @@ export class RAMMSuiPool {
         );
 
         const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
-        const [assetInAggregator] = assetAggregators.splice(assetInIndex, 1);
+        const assetInAggregator = assetAggregators[assetInIndex];
 
         const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
-        const [assetOutAggregator] = assetAggregators.splice(assetOutIndex, 1);
+        const assetOutAggregator = assetAggregators[assetOutIndex];
+
+        assetAggregators = assetAggregators.filter(
+            (_, index) => index !== assetInIndex && index !== assetOutIndex
+        );
 
         // recall that assetAggregators is now missing the assetIn and assetOut aggregators.
 

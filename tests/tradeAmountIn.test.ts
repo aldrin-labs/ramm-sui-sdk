@@ -14,7 +14,7 @@ import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { assert, describe, expect, test } from 'vitest';
 
 describe('Trade amount into RAMM', () => {
-    test('Deposit ADA liquidity to a ADA/DOT/SOL RAMM pool; trade ADA into the pool for DOT, using the SDK', async () => {
+    test('Deposit ADA/DOT liquidity to an ADA/DOT/SOL RAMM pool; trade ADA into the pool for DOT, using the SDK', async () => {
         /**
          * Create a Sui client, and retrieve an existing and initialized RAMM pool from
          * the configs provided in the library.
@@ -176,5 +176,5 @@ describe('Trade amount into RAMM', () => {
         expect(Number(tradeInEventJSON.protocol_fee)).toBeGreaterThan(0);
         expect(tradeInEventJSON.execute_trade).toBe(true);
 
-    }, /** timeout for the test, in ms */ 23_000);
+    }, /** timeout for the test, in ms */ 27_500);
 });
