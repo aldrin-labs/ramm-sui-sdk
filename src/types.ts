@@ -152,7 +152,7 @@ export class RAMMSuiPool {
         txb: TransactionBlock,
         param: {
             assetIn: string,
-            amountIn: string,
+            amountIn: TransactionObjectInput,
     }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
@@ -201,7 +201,7 @@ export class RAMMSuiPool {
         txb: TransactionBlock,
         param: {
             assetOut: string,
-            lpToken: string,
+            lpToken: TransactionObjectInput,
     }) {
         const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {

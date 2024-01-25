@@ -56,38 +56,20 @@ describe('Liquidity deposit', () => {
 
         // BTC has 8 decimal places, so this is 0.01 BTC.
         let btcAmount: number = 1_000_000;
-        txb.moveCall({
-            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins`,
+        let coin = txb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
             arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
             typeArguments: [btcType]
         });
 
-        await suiClient.signAndExecuteTransactionBlock({ signer: testKeypair, transactionBlock: txb });
-
-        // Wait for the network to register the test token request.
-        await sleep(600);
-
-        /**
-         * Perform the liquidity deposit using the SDK
-         */
-
-        let paginatedCoins = await suiClient.getCoins({
-            owner: testKeypair.toSuiAddress(),
-            coinType: btcType,
-        });
-        //console.log(paginatedCoins);
-
-        // Choose any of the test BTC coins the wallet may already have.
-        let btcId = paginatedCoins.data[0].coinObjectId;
-
-        let liqDepTxb = ramm.liquidityDeposit({
-            assetIn: btcType,
-            amountIn: btcId
-        });
+        ramm.liquidityDeposit(
+            txb,
+            { assetIn: btcType, amountIn: coin }
+        );
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: liqDepTxb,
+            transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a trade
                 showEvents: true
@@ -104,5 +86,5 @@ describe('Liquidity deposit', () => {
         expect(Number(liqDepEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount);
         expect(Number(liqDepEventJSON.lpt)).toBeGreaterThan(0);
         expect(Number(liqDepEventJSON.lpt)).toBeLessThan(btcAmount);
-    }, /** timeout for the test, in ms */ 10_000);
+    }, /** timeout for the test, in ms */ 5_000);
 });
