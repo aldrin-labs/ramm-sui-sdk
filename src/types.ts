@@ -231,9 +231,11 @@ export class RAMMSuiPool {
     /**
      * Create a PTB to perform a "sell" trade on a Sui RAMM pool.
      *
+     * @param txb The transaction block to which the trade will be added.
      * @param param.assetIn The Sui Move type of the asset going into the pool.
      * @param param.assetOut The Sui Move type of the asset coming out of the pool.
      * @param param.amountIn The coin object with the amount to deposit into the pool.
+     * It may the result of a previous transaction in the transaction block.
      * @param param.minAmountOut The minimum amount the trade is willing to receive in their
      * trade.
      * @returns The transaction block containing the "sell" trade's `moveCall`.
@@ -245,7 +247,7 @@ export class RAMMSuiPool {
             assetOut: string,
             amountIn: TransactionObjectInput,
             minAmountOut: number,
-    }): TransactionBlock {
+    }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -289,13 +291,12 @@ export class RAMMSuiPool {
                 param.assetOut,
             ].concat(otherAssetTypes),
         });
-
-        return txb
     }
 
     /**
      * Create a PTB to perform a "buy" trade on a Sui RAMM pool.
      *
+     * @param txb The transaction block to which the trade will be added.
      * @param param.assetIn The Sui Move type of the asset going into the pool.
      * @param param.assetOut The Sui Move type of the asset coming out of the pool.
      * @param param.amountOut The trader's exact desired amount of the outgoing asset.
@@ -304,14 +305,14 @@ export class RAMMSuiPool {
      * trade.
      * @returns The transaction block containing the "buy" trade's `moveCall`.
      */
-    tradeAmountOut(param: {
-        assetIn: string,
-        assetOut: string,
-        amountOut: number,
-        maxAmountIn: string,
-    }): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    tradeAmountOut(
+        txb: TransactionBlock,
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountOut: number,
+            maxAmountIn: TransactionObjectInput,
+    }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -355,7 +356,5 @@ export class RAMMSuiPool {
                 param.assetOut,
             ].concat(otherAssetTypes),
         });
-
-        return txb
     }
 }
