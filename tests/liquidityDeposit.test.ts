@@ -51,12 +51,12 @@ describe('Liquidity deposit', () => {
          * Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
         */
 
-        let txb = new TransactionBlock();
-        let btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`;
+        const txb = new TransactionBlock();
+        const btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`;
 
         // BTC has 8 decimal places, so this is 0.01 BTC.
         let btcAmount: number = 1_000_000;
-        let coin = txb.moveCall({
+        const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
             arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
             typeArguments: [btcType]

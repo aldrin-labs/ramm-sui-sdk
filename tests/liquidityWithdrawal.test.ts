@@ -57,7 +57,7 @@ describe('Liquidity withdrawal', () => {
 
         // BTC has 8 decimal places, so this is 0.01 BTC.
         const btcAmount: number = 1_000_000;
-        let coin = txb.moveCall({
+        const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
             arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
             typeArguments: [btcType]
@@ -72,8 +72,6 @@ describe('Liquidity withdrawal', () => {
             signer: testKeypair,
             transactionBlock: txb,
             options: {
-                // required, so that we can scrutinize the response's events for a liq. dep.
-                showEvents: true,
                 // required, so the object ID of the LP tokens can be fetched without
                 // having to perform another RPC call.
                 showEffects: true
@@ -84,8 +82,8 @@ describe('Liquidity withdrawal', () => {
          * Perform the liquidity withdrawal using the SDK
          */
 
-        let lpBtcObj: OwnedObjectRef = resp.effects!.created![0];
-        let lpBtc = Inputs.ObjectRef({
+        const lpBtcObj: OwnedObjectRef = resp.effects!.created![0];
+        const lpBtc = Inputs.ObjectRef({
             digest: lpBtcObj.reference.digest,
             objectId: lpBtcObj.reference.objectId,
             version: lpBtcObj.reference.version
