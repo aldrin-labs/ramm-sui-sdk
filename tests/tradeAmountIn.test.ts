@@ -1,17 +1,13 @@
 import { suiConfigs } from "../src/constants";
 import { RAMMSuiPool } from "../src/types";
 import {
-    LiquidityWithdrawalEvent, RAMMMiscFaucet,
     TESTNET,
     TradeEvent,
     rammMiscFaucet, sleep, testKeypair
 } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent, SuiObjectChange } from '@mysten/sui.js/client';
-import { ObjectCallArg } from "@mysten/sui.js/dist/cjs/builder";
-import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/types/objects";
-import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
-import { Inputs, TransactionBlock } from '@mysten/sui.js/transactions';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
 
 import { assert, describe, expect, test } from 'vitest';
 
@@ -73,52 +69,11 @@ describe('Trade amount into RAMM', () => {
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
             transactionBlock: adaDotTxb,
-            options: {
-                // required, so the object ID of the LP tokens can be fetched without
-                // having to perform another RPC call.
-                showObjectChanges: true
-            }
         });
-
-        /*
-        Disambiguate between the two received LP tokens.
-        */
-
-        const [lpOne, lpTwo]: SuiObjectChange[] = resp.objectChanges!.filter((oc) => oc.type === 'created');
-        // we know that in this test, the only two "created" objects in the tx's changed objects
-        // will be the LP tokens; as such, both can be safely cast to the appropriate variant
-        // of `SuiObjectChange`.
-        const lpOneObj: ObjectCallArg = Inputs.ObjectRef({
-            // @ts-ignore
-            digest: lpOne.digest, 
-            // @ts-ignore
-            objectId: lpOne.objectId,
-            version: lpOne.version
-        });
-        const lpTwoObj: ObjectCallArg = Inputs.ObjectRef({
-            // @ts-ignore
-            digest: lpTwo.digest,
-            // @ts-ignore
-            objectId: lpTwo.objectId,
-            version: lpTwo.version
-        });
-
-        let adaLp: ObjectCallArg;
-        let dotLp: ObjectCallArg;
-        // @ts-ignore
-        if (lpOne.objectType === `0x2::coin::Coin<${ramm.packageId}::${ramm.moduleName}::LP<${adaType}>>`) {
-            adaLp = lpOneObj;
-            dotLp = lpTwoObj;
-        } else {
-            adaLp = lpTwoObj;
-            dotLp = lpOneObj;
-        }
 
         /*
         Onto the trade - perform the DOT "sell" trade using the SDK
         */
-
-        console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
 
         const txb = new TransactionBlock();
 
