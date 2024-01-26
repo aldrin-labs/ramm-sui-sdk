@@ -7,8 +7,9 @@ import {
 } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
+import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/types/objects";
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { Inputs, TransactionBlock } from '@mysten/sui.js/transactions';
 
 import { assert, describe, expect, test } from 'vitest';
 
@@ -51,46 +52,29 @@ describe('Liquidity withdrawal', () => {
          * Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
         */
 
-        const txb = new TransactionBlock();
+        let txb = new TransactionBlock();
         const btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`;
 
         // BTC has 8 decimal places, so this is 0.01 BTC.
         const btcAmount: number = 1_000_000;
-        txb.moveCall({
-            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins`,
+        const coin = txb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
             arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
             typeArguments: [btcType]
         });
 
-        await suiClient.signAndExecuteTransactionBlock({ signer: testKeypair, transactionBlock: txb });
-
-        // Wait for the network to register the test token request.
-        await sleep(600);
-
-        /**
-         * Perform the liquidity deposit using the SDK
-         */
-
-        const paginatedCoins = await suiClient.getCoins({
-            owner: testKeypair.toSuiAddress(),
-            coinType: btcType,
-        });
-        //console.log(paginatedCoins);
-
-        // Choose any of the test BTC coins the wallet may already have.
-        const btcId = paginatedCoins.data[0].coinObjectId;
-
-        const liqDepTxb = ramm.liquidityDeposit({
-            assetIn: btcType,
-            amountIn: btcId
-        });
+        ramm.liquidityDeposit(
+            txb,
+            { assetIn: btcType, amountIn: coin }
+        );
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: liqDepTxb,
+            transactionBlock: txb,
             options: {
-                // required, so that we can scrutinize the response's events for a liq. dep.
-                showEvents: true
+                // required, so the object ID of the LP tokens can be fetched without
+                // having to perform another RPC call.
+                showEffects: true
             }
         });
 
@@ -98,21 +82,23 @@ describe('Liquidity withdrawal', () => {
          * Perform the liquidity withdrawal using the SDK
          */
 
-        const paginatedLPTokens = await suiClient.getCoins({
-            owner: testKeypair.toSuiAddress(),
-            coinType: `${ramm.packageId}::${ramm.moduleName}::LP<${btcType}>`,
+        const lpBtcObj: OwnedObjectRef = resp.effects!.created![0];
+        const lpBtc = Inputs.ObjectRef({
+            digest: lpBtcObj.reference.digest,
+            objectId: lpBtcObj.reference.objectId,
+            version: lpBtcObj.reference.version
         });
-        // Choose any of the LP<BTC> the wallet may already have.
-        const lpBtcId = paginatedLPTokens.data[0].coinObjectId;
 
-        const liqWithTxb = ramm.liquidityWithdrawal({
-            assetOut: btcType,
-            lpToken: lpBtcId
-        });
+        txb = new TransactionBlock();
+
+        ramm.liquidityWithdrawal(
+            txb,
+            { assetOut: btcType,  lpToken: lpBtc }
+        );
 
         resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: liqWithTxb,
+            transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a liq. wthdrwl.
                 showEvents: true
@@ -144,5 +130,5 @@ describe('Liquidity withdrawal', () => {
                 }
             }
         })
-    }, /** timeout for the test, in ms */ 15_000);
+    }, /** timeout for the test, in ms */ 10_000);
 });

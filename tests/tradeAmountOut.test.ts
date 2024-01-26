@@ -1,7 +1,6 @@
 import { suiConfigs } from "../src/constants";
 import { RAMMSuiPool } from "../src/types";
 import {
-    LiquidityWithdrawalEvent, RAMMMiscFaucet,
     TESTNET,
     TradeEvent,
     rammMiscFaucet, sleep, testKeypair
@@ -49,7 +48,8 @@ describe('Trade amount out of RAMM', () => {
         await sleep(600);
 
         /**
-         * Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
+        Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
+        Then, perform liquidity deposits using the SDK
         */
 
         const btcEthTxb = new TransactionBlock();
@@ -58,107 +58,63 @@ describe('Trade amount out of RAMM', () => {
 
         // BTC has 8 decimal places, so this is 1 BTC.
         const btcLiqAmount: number = 100_000_000;
-        // This is 22 ETH
-        const ethLiqAmount: number = 2_200_000_000;
-        btcEthTxb.moveCall({
-            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins`,
+        const btcCoin = btcEthTxb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
             arguments: [btcEthTxb.object(rammMiscFaucet.faucetAddress), btcEthTxb.pure(btcLiqAmount)],
             typeArguments: [btcType]
         });
-        btcEthTxb.moveCall({
-            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins`,
+        // This is 22 ETH
+        const ethLiqAmount: number = 2_200_000_000;
+        const ethCoin = btcEthTxb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
             arguments: [btcEthTxb.object(rammMiscFaucet.faucetAddress), btcEthTxb.pure(ethLiqAmount)],
             typeArguments: [ethType]
         });
-        // This is 0.1 BTC, to be used for the trade.
-        const btcAmount: number = 100_000_000;
-        btcEthTxb.moveCall({
-            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins`,
-            arguments: [btcEthTxb.object(rammMiscFaucet.faucetAddress), btcEthTxb.pure(btcAmount)],
-            typeArguments: [btcType]
-        });
-
-        await suiClient.signAndExecuteTransactionBlock({ signer: testKeypair, transactionBlock: btcEthTxb });
-
-        // Wait for the network to register the test token request.
-        await sleep(600);
-
-        /**
-         * Perform liquidity deposits using the SDK
-         */
-
-        const paginatedEthCoins = await suiClient.getCoins({
-            owner: testKeypair.toSuiAddress(),
-            coinType: ethType,
-        });
-
-        // Get the requested ETH coins' ID.
-        const ethLiqId = paginatedEthCoins.data[0].coinObjectId;
-
-        const paginatedBtcCoins = await suiClient.getCoins({
-            owner: testKeypair.toSuiAddress(),
-            coinType: btcType,
-        });
-
-        // Get the requested BTC coins' ID.
-
-        let btcLiqId: string;
-        let btcId: string;
-
-        // Two BTC coins were requested:
-        // 1. a larger one, to be used for the liquidity deposit
-        // 2. a smaller one, to be used for the trade
-        if (BigInt(paginatedBtcCoins.data[0].balance) > BigInt(paginatedBtcCoins.data[1].balance)) {
-            [btcLiqId, btcId] = [paginatedBtcCoins.data[0].coinObjectId, paginatedBtcCoins.data[1].coinObjectId]
-        } else {
-            [btcLiqId, btcId] = [paginatedBtcCoins.data[1].coinObjectId, paginatedBtcCoins.data[0].coinObjectId]
-        }
 
         // Deposit BTC and ETH liquidity, required for the test
-
-        const btcLiqDepTxb = ramm.liquidityDeposit({
-            assetIn: btcType,
-            amountIn: btcLiqId
-        });
+        ramm.liquidityDeposit(
+            btcEthTxb,
+            { assetIn: btcType, amountIn: btcCoin }
+        );
+        ramm.liquidityDeposit(
+            btcEthTxb,
+            { assetIn: ethType, amountIn: ethCoin }
+        );
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: btcLiqDepTxb,
-            options: {
-                // required, so that we can scrutinize the response's events for a liq. dep.
-                showEvents: true
-            }
+            transactionBlock: btcEthTxb,
         });
-
-        const ethLiqDepTxb = ramm.liquidityDeposit({
-            assetIn: ethType,
-            amountIn: ethLiqId
-        });
-
-        resp = await suiClient.signAndExecuteTransactionBlock({
-            signer: testKeypair,
-            transactionBlock: ethLiqDepTxb,
-        });
-
-        // Wait for the network to register the liquidity deposits.
-        await sleep(600);
 
         /**
          * Perform the ETH "buy" trade using the SDK
          */
 
-        const tradeOutTxb = ramm.tradeAmountOut({
-            assetIn: btcType,
-            assetOut: ethType,
-            // we'd like exactly 1 ETH
-            amountOut: 100_000_000,
-            // and recall that this is 0.1 BTC
-            maxAmountIn: btcId,
+        const txb = new TransactionBlock();
+
+        // This is 0.1 BTC, to be used for the trade.
+        const btcAmount: number = 10_000_000;
+        const coin = txb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
+            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
+            typeArguments: [btcType]
         });
+
+        ramm.tradeAmountOut(
+            txb,
+            {
+                assetIn: btcType,
+                assetOut: ethType,
+                // we'd like exactly 1 ETH
+                amountOut: 100_000_000,
+                // and recall that this is 0.1 BTC
+                maxAmountIn: coin,
+            }
+        );
 
         resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: tradeOutTxb,
+            transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a trade
                 showEvents: true
@@ -170,16 +126,16 @@ describe('Trade amount out of RAMM', () => {
 
         console.log(tradeOutEventJSON);
 
-        return
-
         assert.equal(tradeOutEventJSON.ramm_id, ramm.address);
         assert.equal(tradeOutEventJSON.trader, testKeypair.toSuiAddress());
-        assert.equal('0x' + tradeOutEventJSON.token_in.name, dotType);
-        assert.equal('0x' + tradeOutEventJSON.token_out.name, btcType);
-        assert.equal(Number(tradeOutEventJSON.amount_in), dotAmount);
-        expect(Number(tradeOutEventJSON.amount_out)).toBeGreaterThan(0);
+        assert.equal('0x' + tradeOutEventJSON.token_in.name, btcType);
+        assert.equal('0x' + tradeOutEventJSON.token_out.name, ethType);
+        assert.equal(Number(tradeOutEventJSON.amount_out), 100_000_000);
+        expect(Number(tradeOutEventJSON.amount_in)).toBeGreaterThan(0);
+        expect(Number(tradeOutEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount);
+
         expect(Number(tradeOutEventJSON.protocol_fee)).toBeGreaterThan(0);
         expect(tradeOutEventJSON.execute_trade).toBe(true);
 
-    }, /** timeout for the test, in ms */ 23_000);
+    }, /** timeout for the test, in ms */ 10_000);
 });

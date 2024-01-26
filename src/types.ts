@@ -1,4 +1,4 @@
-import { TransactionBlock, TransactionObjectArgument } from '@mysten/sui.js/transactions';
+import { Inputs, TransactionBlock, TransactionObjectArgument, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 
 export class AssetConfig {
@@ -142,16 +142,18 @@ export class RAMMSuiPool {
      * The returned transaction for the liquidity deposit can signed using a TS SDK keypair, and
      * then sent to the Sui network for execution.
      *
+     * @param txb The transaction block to which the liquidity deposit will be added.
      * @param param.assetIn The Sui Move type of the asset going into the pool.
-     * @param param.amountIn ID of the coin object with the amount to deposit into the pool.
+     * @param param.amountIn The coin object with the amount to deposit into the pool.
+     * It may come from the result of a previous transaction in the transaction block.
      * @returns The transaction block containing the liquidity deposit `moveCall`.
      */
-    liquidityDeposit(param: {
-        assetIn: string,
-        amountIn: string,
-    }): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    liquidityDeposit(
+        txb: TransactionBlock,
+        param: {
+            assetIn: string,
+            amountIn: TransactionObjectInput,
+    }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -181,8 +183,6 @@ export class RAMMSuiPool {
                 param.assetIn,
             ].concat(otherAssetTypes),
         });
-
-        return txb
     }
 
     /**
@@ -191,16 +191,18 @@ export class RAMMSuiPool {
      * The returned transaction for the liquidity withdrawal can be signed using a TS SDK keypair,
      * and then sent to the Sui network for execution.
      *
+     * @param txb The transaction block to which the liquidity withdrawal will be added.
      * @param param.assetOut The Sui Move type of the asset being withdrawn from the pool.
-     * @param param.lpToken ID of the coin object with the LP tokens to redeem from the pool.
+     * @param param.lpToken The coin object with the LP tokens to redeem from the pool.
+     * It may be the result of a previous transaction in the transaction block.
      * @returns The transaction block containing the liquidity withdrawal `moveCall`.
      */
-    liquidityWithdrawal(param: {
-        assetOut: string,
-        lpToken: string,
-    }): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    liquidityWithdrawal(
+        txb: TransactionBlock,
+        param: {
+            assetOut: string,
+            lpToken: TransactionObjectInput,
+    }) {
         const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -224,28 +226,28 @@ export class RAMMSuiPool {
             ].concat(assetAggregators),
             typeArguments: assetTypes
         });
-
-        return txb
     }
 
     /**
      * Create a PTB to perform a "sell" trade on a Sui RAMM pool.
      *
+     * @param txb The transaction block to which the trade will be added.
      * @param param.assetIn The Sui Move type of the asset going into the pool.
      * @param param.assetOut The Sui Move type of the asset coming out of the pool.
-     * @param param.amountIn ID of the coin object with the amount to deposit into the pool.
+     * @param param.amountIn The coin object with the amount to deposit into the pool.
+     * It may come from the result of a previous transaction in the transaction block.
      * @param param.minAmountOut The minimum amount the trade is willing to receive in their
      * trade.
      * @returns The transaction block containing the "sell" trade's `moveCall`.
      */
-    tradeAmountIn(param: {
-        assetIn: string,
-        assetOut: string,
-        amountIn: string,
-        minAmountOut: number,
-    }): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    tradeAmountIn(
+        txb: TransactionBlock,
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountIn: TransactionObjectInput,
+            minAmountOut: number,
+    }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -289,13 +291,12 @@ export class RAMMSuiPool {
                 param.assetOut,
             ].concat(otherAssetTypes),
         });
-
-        return txb
     }
 
     /**
      * Create a PTB to perform a "buy" trade on a Sui RAMM pool.
      *
+     * @param txb The transaction block to which the trade will be added.
      * @param param.assetIn The Sui Move type of the asset going into the pool.
      * @param param.assetOut The Sui Move type of the asset coming out of the pool.
      * @param param.amountOut The trader's exact desired amount of the outgoing asset.
@@ -304,14 +305,14 @@ export class RAMMSuiPool {
      * trade.
      * @returns The transaction block containing the "buy" trade's `moveCall`.
      */
-    tradeAmountOut(param: {
-        assetIn: string,
-        assetOut: string,
-        amountOut: number,
-        maxAmountIn: string,
-    }): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    tradeAmountOut(
+        txb: TransactionBlock,
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountOut: number,
+            maxAmountIn: TransactionObjectInput,
+    }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -355,7 +356,5 @@ export class RAMMSuiPool {
                 param.assetOut,
             ].concat(otherAssetTypes),
         });
-
-        return txb
     }
 }
