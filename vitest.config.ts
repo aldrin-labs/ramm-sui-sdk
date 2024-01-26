@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     poolOptions: {
       threads: {
-        // Threads related options here
+        // Tests cannot be run in parallel to avoid locking objects
         singleThread: true
       }
     }
