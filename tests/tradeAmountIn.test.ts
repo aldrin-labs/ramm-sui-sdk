@@ -8,6 +8,7 @@ import {
 } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent, SuiObjectChange } from '@mysten/sui.js/client';
+import { ObjectCallArg } from "@mysten/sui.js/dist/cjs/builder";
 import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/types/objects";
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { Inputs, TransactionBlock } from '@mysten/sui.js/transactions';
@@ -84,19 +85,27 @@ describe('Trade amount into RAMM', () => {
         */
 
         const [lpOne, lpTwo]: SuiObjectChange[] = resp.objectChanges!.filter((oc) => oc.type === 'created');
-        const lpOneObj = Inputs.ObjectRef({
-            digest: lpOne.digest,
+        // we know that in this test, the only two "created" objects in the tx's changed objects
+        // will be the LP tokens; as such, both can be safely cast to the appropriate variant
+        // of `SuiObjectChange`.
+        const lpOneObj: ObjectCallArg = Inputs.ObjectRef({
+            // @ts-ignore
+            digest: lpOne.digest, 
+            // @ts-ignore
             objectId: lpOne.objectId,
             version: lpOne.version
         });
-        const lpTwoObj = Inputs.ObjectRef({
+        const lpTwoObj: ObjectCallArg = Inputs.ObjectRef({
+            // @ts-ignore
             digest: lpTwo.digest,
+            // @ts-ignore
             objectId: lpTwo.objectId,
             version: lpTwo.version
         });
 
-        let adaLp: OwnedObjectRef;
-        let dotLp: OwnedObjectRef;
+        let adaLp: ObjectCallArg;
+        let dotLp: ObjectCallArg;
+        // @ts-ignore
         if (lpOne.objectType === `0x2::coin::Coin<${ramm.packageId}::${ramm.moduleName}::LP<${adaType}>>`) {
             adaLp = lpOneObj;
             dotLp = lpTwoObj;
