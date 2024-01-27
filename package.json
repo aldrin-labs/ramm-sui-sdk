@@ -8,6 +8,9 @@
         "build:sdk": "tsup ./index.ts --format cjs,esm --dts --clean",
         "test": "vitest"
     },
+    "publishConfig": {
+        "registry": "https://gitlab.com/api/v4/projects/54281288/packages/npm/"
+      },
     "repository": "https://github.com/aldrin-labs/ramm-sui-sdk.git",
     "author": "Alexandre Baldé <alexandre@aldrin.com>",
     "license": "AGPL-3.0",
