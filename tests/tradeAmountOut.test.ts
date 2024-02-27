@@ -126,7 +126,7 @@ describe('Trade amount out of RAMM', () => {
 
         console.log(tradeOutEventJSON);
 
-        assert.equal(tradeOutEventJSON.ramm_id, ramm.address);
+        assert.equal(tradeOutEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(tradeOutEventJSON.trader, testKeypair.toSuiAddress());
         assert.equal('0x' + tradeOutEventJSON.token_in.name, btcType);
         assert.equal('0x' + tradeOutEventJSON.token_out.name, ethType);

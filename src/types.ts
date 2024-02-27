@@ -59,9 +59,9 @@ export class RAMMSuiPool {
      */
     moduleName: string;
     /**
-     * Address of the RAMM object in the Sui network.
+     * Address of the RAMM pool object in the Sui network.
      */
-    address: string;
+    poolAddress: string;
     /**
      * Number of assets in the pool-
      * After pool population and initialization, it cannot be changed - it becomes effectively a
@@ -123,7 +123,7 @@ export class RAMMSuiPool {
         this.name = name;
         this.packageId = packageId;
         this.moduleName = moduleName;
-        this.address = address;
+        this.poolAddress = address;
         this.assetCount = assetCount;
 
 
@@ -174,7 +174,7 @@ export class RAMMSuiPool {
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::liquidity_deposit_${this.assetCount}`,
             arguments: [
-                txb.object(this.address),
+                txb.object(this.poolAddress),
                 txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.object(param.amountIn),
                 assetInAggregator
@@ -220,7 +220,7 @@ export class RAMMSuiPool {
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::liquidity_withdrawal_${this.assetCount}`,
             arguments: [
-                txb.object(this.address),
+                txb.object(this.poolAddress),
                 txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.object(param.lpToken),
             ].concat(assetAggregators),
@@ -279,7 +279,7 @@ export class RAMMSuiPool {
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::trade_amount_in_${this.assetCount}`,
             arguments: [
-                txb.object(this.address),
+                txb.object(this.poolAddress),
                 txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.object(param.amountIn),
                 txb.pure(param.minAmountOut),
@@ -343,7 +343,7 @@ export class RAMMSuiPool {
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::trade_amount_out_${this.assetCount}`,
             arguments: [
-                txb.object(this.address),
+                txb.object(this.poolAddress),
                 txb.object(SUI_CLOCK_OBJECT_ID),
                 txb.pure(param.amountOut),
                 txb.object(param.maxAmountIn),
@@ -357,11 +357,10 @@ export class RAMMSuiPool {
         });
     }
 
-    getPoolState(txb: TransactionBlock, poolAddress: string) {
+    getPoolState(txb: TransactionBlock) {
         txb.moveCall({
             target: `${this.packageId}::${this.moduleName}::get_pool_state`,
-            arguments: [txb.object(poolAddress)],
+            arguments: [txb.object(this.poolAddress)],
         });
-        })
     }
 }

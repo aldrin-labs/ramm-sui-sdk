@@ -79,7 +79,7 @@ describe('Liquidity deposit', () => {
         const liqDepEvent = resp.events![0] as SuiEvent;
         const liqDepEventJSON = liqDepEvent.parsedJson as LiquidityDepositEvent;
 
-        assert.equal(liqDepEventJSON.ramm_id, ramm.address);
+        assert.equal(liqDepEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(liqDepEventJSON.trader, testKeypair.toSuiAddress());
         assert.equal('0x' + liqDepEventJSON.token_in.name, btcType);
         expect(Number(liqDepEventJSON.amount_in)).toBeGreaterThan(0);

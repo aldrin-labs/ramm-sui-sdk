@@ -110,7 +110,7 @@ describe('Liquidity withdrawal', () => {
 
         console.log(JSON.stringify(liqWithEventJSON, null, 4));
 
-        assert.equal(liqWithEventJSON.ramm_id, ramm.address);
+        assert.equal(liqWithEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(liqWithEventJSON.trader, testKeypair.toSuiAddress());
         assert.equal('0x' + liqWithEventJSON.token_out.name, btcType);
 
