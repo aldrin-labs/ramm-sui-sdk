@@ -357,6 +357,15 @@ export class RAMMSuiPool {
         });
     }
 
+    /**
+     * Given the current `RAMMSuiPool` object and a `TransactionBlock` object, add a Move call
+     * to the transaction block to query the pool's state.
+     *
+     * This Move call will emit an event in the transaction block's response, which can be
+     * inspected to obtain the pool's state - see tests.
+     *
+     * @param txb Transaction block to which the pool state query Move call will be added.
+     */
     getPoolState(txb: TransactionBlock) {
         txb.moveCall({
             target: `${this.packageId}::${this.moduleName}::get_pool_state`,
