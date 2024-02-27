@@ -356,4 +356,12 @@ export class RAMMSuiPool {
             ].concat(otherAssetTypes),
         });
     }
+
+    getPoolState(txb: TransactionBlock, poolAddress: string) {
+        txb.moveCall({
+            target: `${this.packageId}::${this.moduleName}::get_pool_state`,
+            arguments: [txb.object(poolAddress)],
+        });
+        })
+    }
 }
