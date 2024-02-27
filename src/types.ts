@@ -300,9 +300,8 @@ export class RAMMSuiPool {
      * @param param.assetIn The Sui Move type of the asset going into the pool.
      * @param param.assetOut The Sui Move type of the asset coming out of the pool.
      * @param param.amountOut The trader's exact desired amount of the outgoing asset.
-     * @param param.maxAmountIn The ID of a coin object whose amount is the most the trade is
-     * willing to deposit.
-     * trade.
+     * @param param.maxAmountIn The ID of a coin object whose amount is the most the trader is
+     *        willing to trade.
      * @returns The transaction block containing the "buy" trade's `moveCall`.
      */
     tradeAmountOut(
