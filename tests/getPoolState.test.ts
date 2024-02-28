@@ -10,6 +10,7 @@ import {
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
+import exp from "constants";
 
 import { assert, describe, expect, test } from 'vitest';
 
@@ -63,11 +64,16 @@ describe('Pool state query', () => {
         const poolStateEvent = resp.events![0] as SuiEvent;
         const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
 
+        expect(poolStateEventJSON.ramm_id).toBe(ramm.poolAddress);
+        expect(poolStateEventJSON.sender).toBe(testKeypair.toSuiAddress());
+
+        expect(poolStateEventJSON.asset_balances.length).toBe(ramm.assetCount);
         expect(Number(poolStateEventJSON.asset_balances[0])).toBeGreaterThan(0);
         expect(Number(poolStateEventJSON.asset_balances[1])).toBeGreaterThan(0);
         // recall that this test pool may have 0 SOL deposited to it
         expect(Number(poolStateEventJSON.asset_balances[2])).toBeGreaterThanOrEqual(0);
 
+        expect(poolStateEventJSON.asset_lpt_issued.length).toBe(ramm.assetCount);
         expect(Number(poolStateEventJSON.asset_lpt_issued[0])).toBeGreaterThan(0);
         expect(Number(poolStateEventJSON.asset_lpt_issued[1])).toBeGreaterThan(0);
         // recall that this test pool may have 0 SOL deposited to it, and thus no issued LP<SOL>
@@ -75,10 +81,10 @@ describe('Pool state query', () => {
 
         console.log(poolStateEventJSON);
 
+        expect(poolStateEventJSON.asset_types).toBe(ramm.assetCount);
         expect(poolStateEventJSON.asset_types[0].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`);
         expect(poolStateEventJSON.asset_types[1].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ETH`);
         expect(poolStateEventJSON.asset_types[2].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::SOL`);
 
-        
     }, /** timeout for the test, in ms */ 5_000);
 });
