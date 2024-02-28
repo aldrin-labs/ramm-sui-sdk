@@ -10,8 +10,8 @@
 
 `yarn test`
 
-Note that tests require a `.env` file in the root of the repository with a Sui `PRIVATE_KEY` (testnet),
-with a sufficient `Coin<SUI>` balance for trades.
+Note that tests require a `PRIVATE_KEY` variable present in the shell's environment.
+The key must have a sufficient `Coin<SUI>` balance for trades - in the testnet.
 
 # License
 

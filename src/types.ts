@@ -364,7 +364,7 @@ export class RAMMSuiPool {
      * This Move call will emit an event in the transaction block's response, which can be
      * inspected to obtain the pool's state - see tests.
      *
-     * @param txb Transaction block to which the pool state query Move call will be added.
+     * @param txb Transaction block to which the Move call with the pool state query will be added.
      */
     getPoolState(txb: TransactionBlock) {
         txb.moveCall({
