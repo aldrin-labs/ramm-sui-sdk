@@ -128,3 +128,14 @@ export type TradeEvent = {
     protocol_fee: number,
     execute_trade: boolean,
 }
+
+/**
+ * Structure representing the Sui Move event, in JSON, of a RAMM's pool state query.
+ */
+export type PoolStateEvent = {
+    ramm_id: string,
+    sender: string,
+    asset_types: string[],
+    asset_balances: number[],
+    asset_lpt_issued: number[],
+}
