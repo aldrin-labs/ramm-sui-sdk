@@ -63,6 +63,22 @@ describe('Pool state query', () => {
         const poolStateEvent = resp.events![0] as SuiEvent;
         const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
 
+        expect(Number(poolStateEventJSON.asset_balances[0])).toBeGreaterThan(0);
+        expect(Number(poolStateEventJSON.asset_balances[1])).toBeGreaterThan(0);
+        // recall that this test pool may have 0 SOL deposited to it
+        expect(Number(poolStateEventJSON.asset_balances[2])).toBeGreaterThanOrEqual(0);
+
+        expect(Number(poolStateEventJSON.asset_lpt_issued[0])).toBeGreaterThan(0);
+        expect(Number(poolStateEventJSON.asset_lpt_issued[1])).toBeGreaterThan(0);
+        // recall that this test pool may have 0 SOL deposited to it, and thus no issued LP<SOL>
+        expect(Number(poolStateEventJSON.asset_lpt_issued[2])).toBeGreaterThanOrEqual(0);
+
         console.log(poolStateEventJSON);
+
+        expect(poolStateEventJSON.asset_types[0].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`);
+        expect(poolStateEventJSON.asset_types[1].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ETH`);
+        expect(poolStateEventJSON.asset_types[2].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::SOL`);
+
+        
     }, /** timeout for the test, in ms */ 5_000);
 });

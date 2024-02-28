@@ -69,7 +69,7 @@ export type RAMMMiscFaucet = {
 }
 
 export const rammMiscFaucet: RAMMMiscFaucet = {
-    packageId: '0x937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b',
+    packageId: '937e867b32da5c423e615d03d9f5e898fdf08d8f94d8b0d97805d5c3f06e0a1b',
     faucetModule: 'test_coin_faucet',
     testCoinsModule: 'test_coins',
 
@@ -135,7 +135,7 @@ export type TradeEvent = {
 export type PoolStateEvent = {
     ramm_id: string,
     sender: string,
-    asset_types: string[],
+    asset_types: TypeName[],
     asset_balances: number[],
     asset_lpt_issued: number[],
 }
