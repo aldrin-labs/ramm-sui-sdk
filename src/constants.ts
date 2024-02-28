@@ -8,7 +8,7 @@ export const suiConfigs: SuiNetworkConfigs = {
     suiTestnet: [
         {
             name: 'Sui Testnet ADA/DOT/SOL RAMM',
-            packageId: '0x71842d2b44e795901b99be7ba1d9db524ee5df6674cc0270088db4e95166dd89',
+            packageId: '0xe043cbd37dbfce0ffcacdf53bece8e587556b89e78fe920226589cda0a3cf796',
             moduleName: 'ramm',
             address: '0xab90449e8d5322d964d758a81f31d5491b8da28455f0e840aca1c8868379c2be',
             assetCount: 3,
@@ -45,7 +45,7 @@ export const suiConfigs: SuiNetworkConfigs = {
 
         {
             name: 'Sui Testnet BTC/ETH/SOL RAMM',
-            packageId: '0x71842d2b44e795901b99be7ba1d9db524ee5df6674cc0270088db4e95166dd89',
+            packageId: '0xe043cbd37dbfce0ffcacdf53bece8e587556b89e78fe920226589cda0a3cf796',
             moduleName: 'ramm',
             address: '0xbd08e351fdece13104b35fc83ce1cc8584cc992d39cc6663d4cd4a5b5afaa0c7',
             assetCount: 3,
