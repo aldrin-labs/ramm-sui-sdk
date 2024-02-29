@@ -108,7 +108,7 @@ describe('Trade amount into RAMM', () => {
         const tradeInEvent = resp.events![0] as SuiEvent;
         const tradeInEventJSON = tradeInEvent.parsedJson as TradeEvent;
 
-        assert.equal(tradeInEventJSON.ramm_id, ramm.address);
+        assert.equal(tradeInEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(tradeInEventJSON.trader, testKeypair.toSuiAddress());
         assert.equal('0x' + tradeInEventJSON.token_in.name, dotType);
         assert.equal('0x' + tradeInEventJSON.token_out.name, adaType);
