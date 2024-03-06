@@ -293,7 +293,7 @@ export class RAMMSuiPool {
         });
     }
 
-    async estimatePricetradeAmountIn(
+    async estimatePriceTradeAmountIn(
         sender: string,
         client: SuiClient,
         param: {
