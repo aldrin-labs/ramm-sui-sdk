@@ -112,13 +112,13 @@ describe('Liquidity withdrawal', () => {
 
         assert.equal(liqWithEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(liqWithEventJSON.trader, testKeypair.toSuiAddress());
-        assert.equal('0x' + liqWithEventJSON.token_out.name, btcType);
+        assert.equal(liqWithEventJSON.token_out.name, btcType);
 
         expect(Number(liqWithEventJSON.lpt)).toBeGreaterThan(0);
         expect(Number(liqWithEventJSON.lpt)).toBeLessThanOrEqual(btcAmount);
 
         liqWithEventJSON.amounts_out.contents.forEach((assetData) => {
-            switch ('0x' + assetData.key.name) {
+            switch (assetData.key.name) {
                 case btcType: {
                     expect(Number(assetData.value)).toBeGreaterThan(0);
                     expect(Number(assetData.value)).toBeLessThanOrEqual(btcAmount);
