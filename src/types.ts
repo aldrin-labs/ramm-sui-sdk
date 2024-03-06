@@ -1,4 +1,5 @@
-import { Inputs, TransactionBlock, TransactionObjectArgument, TransactionObjectInput } from '@mysten/sui.js/transactions';
+import { DevInspectResults, SuiClient } from '@mysten/sui.js/dist/cjs/client';
+import { TransactionBlock, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 
 export class AssetConfig {
@@ -290,6 +291,31 @@ export class RAMMSuiPool {
                 param.assetOut,
             ].concat(otherAssetTypes),
         });
+    }
+
+    async estimatePricetradeAmountIn(
+        sender: string,
+        client: SuiClient,
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountInNum: number,
+            amountInCoin: TransactionObjectInput,
+    }): Promise<DevInspectResults> {
+        const txb = new TransactionBlock();
+        this.tradeAmountIn(txb, {
+            assetIn: param.assetIn,
+            assetOut: param.assetOut,
+            amountIn: param.amountInCoin,
+            minAmountOut: 1
+        });
+
+        const devInspectRes = await client.devInspectTransactionBlock({
+            sender,
+            transactionBlock: txb,
+        });
+
+        return devInspectRes
     }
 
     /**
