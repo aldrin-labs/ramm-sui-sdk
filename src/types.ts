@@ -126,7 +126,6 @@ export class RAMMSuiPool {
         this.poolAddress = address;
         this.assetCount = assetCount;
 
-
         this.assetTypeIndices = assetTypeIndices;
         this.assetConfigs = assetConfigs;
 
