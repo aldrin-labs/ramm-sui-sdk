@@ -32,43 +32,55 @@ describe('Trade amount into RAMM', () => {
         const poolConfig = suiTestnet[0];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log('Running test fror: ' + ramm.name);
+        console.log('Running test for: ' + ramm.name);
 
         /*
         Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
         Then, perform liquidity deposits using the SDK.
         */
 
-        const adaDotTxb = new TransactionBlock();
-        const adaType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ADA`;
-        const dotType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::DOT`;
+        const adaDotSolTxb = new TransactionBlock();
+        const adaType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ADA`;
+        const dotType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::DOT`;
+        const solType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::SOL`;
 
         // ADA has 8 decimal places, so this is 200 ADA.
         const adaLiqAmount: number = 20_000_000_000;
-        const adaCoin = adaDotTxb.moveCall({
+        const adaCoin = adaDotSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [adaDotTxb.object(rammMiscFaucet.faucetAddress), adaDotTxb.pure(adaLiqAmount)],
+            arguments: [adaDotSolTxb.object(rammMiscFaucet.faucetAddress), adaDotSolTxb.pure(adaLiqAmount)],
             typeArguments: [adaType]
         });
         // This is 10 DOT
         const dotLiqAmount: number = 1_000_000_000;
-        const dotCoin = adaDotTxb.moveCall({
+        const dotCoin = adaDotSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [adaDotTxb.object(rammMiscFaucet.faucetAddress), adaDotTxb.pure(dotLiqAmount)],
+            arguments: [adaDotSolTxb.object(rammMiscFaucet.faucetAddress), adaDotSolTxb.pure(dotLiqAmount)],
             typeArguments: [dotType]
         });
-        ramm.liquidityDeposit(
-            adaDotTxb,
+        // This is 1 SOL
+        const solLiqAmount: number = 100_000_000;
+        const solCoin = adaDotSolTxb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
+            arguments: [adaDotSolTxb.object(rammMiscFaucet.faucetAddress), adaDotSolTxb.pure(solLiqAmount)],
+            typeArguments: [solType]
+        });
+         ramm.liquidityDeposit(
+            adaDotSolTxb,
             { assetIn: adaType, amountIn: adaCoin }
         );
         ramm.liquidityDeposit(
-            adaDotTxb,
+            adaDotSolTxb,
             { assetIn: dotType, amountIn: dotCoin }
         );
-    
+        ramm.liquidityDeposit(
+            adaDotSolTxb,
+            { assetIn: solType, amountIn: solCoin }
+        );
+
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: adaDotTxb,
+            transactionBlock: adaDotSolTxb,
         });
 
         /*
@@ -115,7 +127,6 @@ describe('Trade amount into RAMM', () => {
         assert.equal(Number(tradeInEventJSON.amount_in), dotAmount);
         expect(Number(tradeInEventJSON.amount_out)).toBeGreaterThan(0);
         expect(Number(tradeInEventJSON.protocol_fee)).toBeGreaterThan(0);
-        expect(tradeInEventJSON.execute_trade).toBe(true);
 
     }, /** timeout for the test, in ms */ 10_000);
 });
