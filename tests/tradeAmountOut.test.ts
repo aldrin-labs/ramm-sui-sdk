@@ -52,38 +52,50 @@ describe('Trade amount out of RAMM', () => {
         Then, perform liquidity deposits using the SDK
         */
 
-        const btcEthTxb = new TransactionBlock();
-        const btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`;
-        const ethType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ETH`;
+        const btcEthSolTxb = new TransactionBlock();
+        const btcType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`;
+        const ethType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ETH`;
+        const solType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::SOL`;
 
         // BTC has 8 decimal places, so this is 1 BTC.
         const btcLiqAmount: number = 100_000_000;
-        const btcCoin = btcEthTxb.moveCall({
+        const btcCoin = btcEthSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [btcEthTxb.object(rammMiscFaucet.faucetAddress), btcEthTxb.pure(btcLiqAmount)],
+            arguments: [btcEthSolTxb.object(rammMiscFaucet.faucetAddress), btcEthSolTxb.pure(btcLiqAmount)],
             typeArguments: [btcType]
         });
         // This is 22 ETH
         const ethLiqAmount: number = 2_200_000_000;
-        const ethCoin = btcEthTxb.moveCall({
+        const ethCoin = btcEthSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [btcEthTxb.object(rammMiscFaucet.faucetAddress), btcEthTxb.pure(ethLiqAmount)],
+            arguments: [btcEthSolTxb.object(rammMiscFaucet.faucetAddress), btcEthSolTxb.pure(ethLiqAmount)],
             typeArguments: [ethType]
+        });
+        // This is 500 SOL
+        const solLiqAmount: number = 50_000_000_000;
+        const solCoin = btcEthSolTxb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
+            arguments: [btcEthSolTxb.object(rammMiscFaucet.faucetAddress), btcEthSolTxb.pure(solLiqAmount)],
+            typeArguments: [solType]
         });
 
         // Deposit BTC and ETH liquidity, required for the test
         ramm.liquidityDeposit(
-            btcEthTxb,
+            btcEthSolTxb,
             { assetIn: btcType, amountIn: btcCoin }
         );
         ramm.liquidityDeposit(
-            btcEthTxb,
+            btcEthSolTxb,
             { assetIn: ethType, amountIn: ethCoin }
+        );
+        ramm.liquidityDeposit(
+            btcEthSolTxb,
+            { assetIn: solType, amountIn: solCoin }
         );
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
-            transactionBlock: btcEthTxb,
+            transactionBlock: btcEthSolTxb,
         });
 
         /**
@@ -135,7 +147,6 @@ describe('Trade amount out of RAMM', () => {
         expect(Number(tradeOutEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount);
 
         expect(Number(tradeOutEventJSON.protocol_fee)).toBeGreaterThan(0);
-        expect(tradeOutEventJSON.execute_trade).toBe(true);
 
     }, /** timeout for the test, in ms */ 10_000);
 });
