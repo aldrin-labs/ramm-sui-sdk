@@ -41,13 +41,13 @@ describe('Trade amount into RAMM', () => {
         Onto the trade - perform the DOT "sell" trade using the SDK
         */
 
-        // This is 1 DOT, to be used for the trade.
-        const dotAmount: number = 100_000_000;
+        // This is 20 ADA, to be used for the trade.
+        const adaAmount: number = 100_000_000;
         const estimate_txb = ramm.estimatePriceTradeAmountIn(
             {
-                assetIn: dotType,
-                assetOut: adaType,
-                amountIn: dotAmount,
+                assetIn: adaType,
+                assetOut: dotType,
+                amountIn: adaAmount,
             }
         );
         const devInspectRes = await suiClient.devInspectTransactionBlock({
@@ -57,20 +57,20 @@ describe('Trade amount into RAMM', () => {
 
         const priceEstimationEventJSON = devInspectRes.events[0].parsedJson as PriceEstimationEvent;
 
-/*         const txb = new TransactionBlock();
-        // This is 1 DOT, to be used for the trade.
+        const txb = new TransactionBlock();
+        // This is 20 ADA, to be used for the trade.
         const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(dotAmount)],
-            typeArguments: [dotType]
+            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(adaAmount)],
+            typeArguments: [adaType]
         });
         ramm.tradeAmountIn(
             txb,
             {
-                assetIn: dotType,
-                assetOut: adaType,
+                assetIn: adaType,
+                assetOut: dotType,
                 amountIn: coin,
-                // any ADA is fine
+                // any DOT is fine
                 minAmountOut: 1,
             }
         );
@@ -87,7 +87,14 @@ describe('Trade amount into RAMM', () => {
         const tradeInEvent = resp.events![0] as SuiEvent;
         const tradeInEventJSON = tradeInEvent.parsedJson as TradeEvent;
 
-        assert.equal() */
+        console.log(priceEstimationEventJSON);
+        console.log(tradeInEventJSON);
 
-    }, /** timeout for the test, in ms */ 500);
+        const dot_per_ada_price: number = priceEstimationEventJSON.amount_out / priceEstimationEventJSON.amount_in;
+        const ada_per_dot_price: number = priceEstimationEventJSON.amount_in / priceEstimationEventJSON.amount_out;
+        console.log('Estimation: 1 ADA would buy ' + dot_per_ada_price + ' DOT');
+        console.log('Estimation: 1 DOT would buy ' + ada_per_dot_price + ' ADA');
+        console.log('Tx fee would be: ' + priceEstimationEventJSON.protocol_fee);
+
+    }, /** timeout for the test, in ms */ 5_000);
 });
