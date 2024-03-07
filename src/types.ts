@@ -29,7 +29,7 @@ export class RAMMSuiPoolConfig {
     name: string;
     packageId: string;
     moduleName: string;
-    address: string;
+    poolAddress: string;
     assetCount: number;
 
     assetTypeIndices: Map<string, number>;
@@ -106,7 +106,7 @@ export class RAMMSuiPool {
             name,
             packageId,
             moduleName,
-            address,
+            poolAddress,
             assetCount,
             assetTypeIndices,
             assetConfigs,
@@ -124,7 +124,7 @@ export class RAMMSuiPool {
         this.name = name;
         this.packageId = packageId;
         this.moduleName = moduleName;
-        this.poolAddress = address;
+        this.poolAddress = poolAddress;
         this.assetCount = assetCount;
 
         this.assetTypeIndices = assetTypeIndices;
