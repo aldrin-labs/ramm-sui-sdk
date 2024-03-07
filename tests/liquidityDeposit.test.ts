@@ -33,7 +33,7 @@ describe('Liquidity deposit', () => {
         const poolConfig = suiTestnet[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log(ramm);
+        console.log('Running test for: ' + ramm.name);
 
         /**
          * Request SUI from the testnet's faucet.
@@ -79,9 +79,11 @@ describe('Liquidity deposit', () => {
         const liqDepEvent = resp.events![0] as SuiEvent;
         const liqDepEventJSON = liqDepEvent.parsedJson as LiquidityDepositEvent;
 
+        console.log(liqDepEventJSON);
+
         assert.equal(liqDepEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(liqDepEventJSON.trader, testKeypair.toSuiAddress());
-        assert.equal('0x' + liqDepEventJSON.token_in.name, btcType);
+        assert.equal(liqDepEventJSON.token_in.name, btcType);
         expect(Number(liqDepEventJSON.amount_in)).toBeGreaterThan(0);
         expect(Number(liqDepEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount);
         expect(Number(liqDepEventJSON.lpt)).toBeGreaterThan(0);

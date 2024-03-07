@@ -1,4 +1,5 @@
-import { Inputs, TransactionBlock, TransactionObjectArgument, TransactionObjectInput } from '@mysten/sui.js/transactions';
+import { DevInspectResults, SuiClient } from '@mysten/sui.js/dist/cjs/client';
+import { TransactionBlock, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 
 export class AssetConfig {
@@ -28,7 +29,7 @@ export class RAMMSuiPoolConfig {
     name: string;
     packageId: string;
     moduleName: string;
-    address: string;
+    poolAddress: string;
     assetCount: number;
 
     assetTypeIndices: Map<string, number>;
@@ -105,7 +106,7 @@ export class RAMMSuiPool {
             name,
             packageId,
             moduleName,
-            address,
+            poolAddress,
             assetCount,
             assetTypeIndices,
             assetConfigs,
@@ -123,9 +124,8 @@ export class RAMMSuiPool {
         this.name = name;
         this.packageId = packageId;
         this.moduleName = moduleName;
-        this.poolAddress = address;
+        this.poolAddress = poolAddress;
         this.assetCount = assetCount;
-
 
         this.assetTypeIndices = assetTypeIndices;
         this.assetConfigs = assetConfigs;
@@ -291,6 +291,70 @@ export class RAMMSuiPool {
                 param.assetOut,
             ].concat(otherAssetTypes),
         });
+    }
+
+    /**
+     * Create a PTB to estimate a trade's price and fee.
+     *
+     * @param param.assetIn The Sui Move type of the asset that would be going into the pool.
+     * @param param.assetOut The Sui Move type of the asset that would be coming out of the pool.
+     * @param param.amountIn The hypothetical trade's amount
+     * @returns The transaction block containing the price estimation's `moveCall`. It can then be
+     * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
+     */
+    estimatePriceTradeAmountIn(
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountIn: number,
+        }
+    ): TransactionBlock {
+        const txb = new TransactionBlock();
+
+        let assetAggregators = this.assetConfigs.map(
+            (assetConfig) => {
+                let str = assetConfig.assetAggregator;
+                return txb.object(str);
+            }
+        );
+
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
+        const assetInAggregator = assetAggregators[assetInIndex];
+
+        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
+        const assetOutAggregator = assetAggregators[assetOutIndex];
+
+        assetAggregators = assetAggregators.filter(
+            (_, index) => index !== assetInIndex && index !== assetOutIndex
+        );
+
+        // notice that assetAggregators is now missing the assetIn and assetOut aggregators.
+
+        const otherAssetTypes: string[] = this
+            .assetConfigs
+            .map(
+                (assetConfig) => assetConfig.assetType
+            )
+            .filter(
+                (assetType) => assetType !== param.assetIn && assetType !== param.assetOut
+            );
+
+        txb.moveCall({
+            target: `${this.packageId}::interface${this.assetCount}::trade_price_estimate_${this.assetCount}`,
+            arguments: [
+                txb.object(this.poolAddress),
+                txb.object(SUI_CLOCK_OBJECT_ID),
+                txb.pure(param.amountIn),
+                assetInAggregator,
+                assetOutAggregator,
+            ].concat(assetAggregators),
+            typeArguments: [
+                param.assetIn,
+                param.assetOut,
+            ].concat(otherAssetTypes),
+        });
+
+        return txb
     }
 
     /**

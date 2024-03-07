@@ -8,9 +8,9 @@ export const suiConfigs: SuiNetworkConfigs = {
     suiTestnet: [
         {
             name: 'Sui Testnet ADA/DOT/SOL RAMM',
-            packageId: '0xe043cbd37dbfce0ffcacdf53bece8e587556b89e78fe920226589cda0a3cf796',
+            packageId: '0xd3283fa556731370cd2a7f389b3e35c630184118b5af416ce9e57edfce751496',
             moduleName: 'ramm',
-            address: '0xab90449e8d5322d964d758a81f31d5491b8da28455f0e840aca1c8868379c2be',
+            poolAddress: '0x1eefca843bb1779bc87689169a732eef268d979b1f0ac0b560d0f8af66d23eed',
             assetCount: 3,
 
             assetTypeIndices: new Map([
@@ -45,9 +45,9 @@ export const suiConfigs: SuiNetworkConfigs = {
 
         {
             name: 'Sui Testnet BTC/ETH/SOL RAMM',
-            packageId: '0xe043cbd37dbfce0ffcacdf53bece8e587556b89e78fe920226589cda0a3cf796',
+            packageId: '0xd3283fa556731370cd2a7f389b3e35c630184118b5af416ce9e57edfce751496',
             moduleName: 'ramm',
-            address: '0xbd08e351fdece13104b35fc83ce1cc8584cc992d39cc6663d4cd4a5b5afaa0c7',
+            poolAddress: '0xf47a4d16f93e957f9fc5a24997ba1a22ae41cfe37231fdf148419d218681b5e5',
             assetCount: 3,
 
             assetTypeIndices: new Map([

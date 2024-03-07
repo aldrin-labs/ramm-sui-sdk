@@ -35,7 +35,7 @@ describe('Pool state query', () => {
         const poolConfig = suiTestnet[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log(ramm);
+        console.log('Running test for: ' + ramm.name);
 
         /**
          * Request SUI from the testnet's faucet.
@@ -81,7 +81,7 @@ describe('Pool state query', () => {
 
         console.log(poolStateEventJSON);
 
-        expect(poolStateEventJSON.asset_types).toBe(ramm.assetCount);
+        expect(poolStateEventJSON.asset_types.length).toBe(ramm.assetCount);
         expect(poolStateEventJSON.asset_types[0].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`);
         expect(poolStateEventJSON.asset_types[1].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::ETH`);
         expect(poolStateEventJSON.asset_types[2].name).toBe(`${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::SOL`);
