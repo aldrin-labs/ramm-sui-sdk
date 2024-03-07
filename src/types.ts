@@ -293,30 +293,57 @@ export class RAMMSuiPool {
         });
     }
 
-    async estimatePriceTradeAmountIn(
-        sender: string,
-        txb: TransactionBlock,
-        client: SuiClient,
-        param: {
-            assetIn: string,
-            assetOut: string,
-            amountInNum: number,
-            amountInCoin: TransactionObjectInput,
-        }
-    ): Promise<DevInspectResults> {
-        this.tradeAmountIn(txb, {
-            assetIn: param.assetIn,
-            assetOut: param.assetOut,
-            amountIn: param.amountInCoin,
-            minAmountOut: 1
+    estimatePriceTradeAmountIn(
+        assetIn: string,
+        assetOut: string,
+        amountIn: number,
+    ): TransactionBlock {
+        const txb = new TransactionBlock();
+
+        let assetAggregators = this.assetConfigs.map(
+            (assetConfig) => {
+                let str = assetConfig.assetAggregator;
+                return txb.object(str);
+            }
+        );
+
+        const assetInIndex: number  = this.assetTypeIndices.get(assetIn) as number;
+        const assetInAggregator = assetAggregators[assetInIndex];
+
+        const assetOutIndex: number  = this.assetTypeIndices.get(assetOut) as number;
+        const assetOutAggregator = assetAggregators[assetOutIndex];
+
+        assetAggregators = assetAggregators.filter(
+            (_, index) => index !== assetInIndex && index !== assetOutIndex
+        );
+
+        // notice that assetAggregators is now missing the assetIn and assetOut aggregators.
+
+        const otherAssetTypes: string[] = this
+            .assetConfigs
+            .map(
+                (assetConfig) => assetConfig.assetType
+            )
+            .filter(
+                (assetType) => assetType !== assetIn && assetType !== assetOut
+            );
+
+        txb.moveCall({
+            target: `${this.packageId}::interface${this.assetCount}::trade_price_estimate_${this.assetCount}`,
+            arguments: [
+                txb.object(this.poolAddress),
+                txb.object(SUI_CLOCK_OBJECT_ID),
+                txb.pure(amountIn),
+                assetInAggregator,
+                assetOutAggregator,
+            ].concat(assetAggregators),
+            typeArguments: [
+                assetIn,
+                assetOut,
+            ].concat(otherAssetTypes),
         });
 
-        const devInspectRes = await client.devInspectTransactionBlock({
-            sender,
-            transactionBlock: txb,
-        });
-
-        return devInspectRes
+        return txb
     }
 
     /**
