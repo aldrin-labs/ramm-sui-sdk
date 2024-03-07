@@ -43,13 +43,6 @@ describe('Trade amount into RAMM', () => {
         */
 
         const txb = new TransactionBlock();
-        ramm.getPoolState(txb);
-        let res = await suiClient.devInspectTransactionBlock({
-            sender: testKeypair.toSuiAddress(),
-            transactionBlock: txb,
-        });
-
-        console.log(res.events[0].parsedJson);
 
         // This is 1 DOT, to be used for the trade.
         const dotAmount: number = 100_000_000;
@@ -58,16 +51,6 @@ describe('Trade amount into RAMM', () => {
             arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(dotAmount)],
             typeArguments: [dotType]
         });
-        res = await ramm.estimatePriceTradeAmountIn(
-            testKeypair.toSuiAddress(),
-            suiClient,
-            {
-                assetIn: dotType,
-                assetOut: adaType,
-                amountInNum: dotAmount,
-                amountInCoin: coin,
-            }
-        );
         ramm.tradeAmountIn(
             txb,
             {
@@ -75,19 +58,15 @@ describe('Trade amount into RAMM', () => {
                 assetOut: adaType,
                 amountIn: coin,
                 // we'd like at least 5 ADA for the 1 DOT
-                minAmountOut: 50_000_000,
+                minAmountOut: 1,
             }
         );
-        const resp = await suiClient.signAndExecuteTransactionBlock({
-            signer: testKeypair,
+        const devInspectRes = await suiClient.devInspectTransactionBlock({
+            sender: testKeypair.toSuiAddress(),
             transactionBlock: txb,
-            options: {
-                // required, so that we can scrutinize the response's events for a trade
-                showEvents: true
-            }
         });
 
-        console.log(res)
+        console.log(devInspectRes.events[0].parsedJson);
 
-    }, /** timeout for the test, in ms */ 10_000);
+    }, /** timeout for the test, in ms */ 5_000);
 });

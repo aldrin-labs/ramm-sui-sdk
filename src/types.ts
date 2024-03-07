@@ -295,14 +295,15 @@ export class RAMMSuiPool {
 
     async estimatePriceTradeAmountIn(
         sender: string,
+        txb: TransactionBlock,
         client: SuiClient,
         param: {
             assetIn: string,
             assetOut: string,
             amountInNum: number,
             amountInCoin: TransactionObjectInput,
-    }): Promise<DevInspectResults> {
-        const txb = new TransactionBlock();
+        }
+    ): Promise<DevInspectResults> {
         this.tradeAmountIn(txb, {
             assetIn: param.assetIn,
             assetOut: param.assetOut,
