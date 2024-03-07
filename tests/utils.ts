@@ -138,3 +138,13 @@ export type PoolStateEvent = {
     asset_balances: number[],
     asset_lpt_issued: number[],
 }
+
+export type PriceEstimationEvent = {
+    ramm_id: string,
+    trader: string,
+    token_in: TypeName,
+    token_out: TypeName,
+    amount_in: number,
+    amount_out: number,
+    protocol_fee: number,
+}

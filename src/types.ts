@@ -294,9 +294,11 @@ export class RAMMSuiPool {
     }
 
     estimatePriceTradeAmountIn(
-        assetIn: string,
-        assetOut: string,
-        amountIn: number,
+        param: {
+            assetIn: string,
+            assetOut: string,
+            amountIn: number,
+        }
     ): TransactionBlock {
         const txb = new TransactionBlock();
 
@@ -307,10 +309,10 @@ export class RAMMSuiPool {
             }
         );
 
-        const assetInIndex: number  = this.assetTypeIndices.get(assetIn) as number;
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
         const assetInAggregator = assetAggregators[assetInIndex];
 
-        const assetOutIndex: number  = this.assetTypeIndices.get(assetOut) as number;
+        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
         const assetOutAggregator = assetAggregators[assetOutIndex];
 
         assetAggregators = assetAggregators.filter(
@@ -325,7 +327,7 @@ export class RAMMSuiPool {
                 (assetConfig) => assetConfig.assetType
             )
             .filter(
-                (assetType) => assetType !== assetIn && assetType !== assetOut
+                (assetType) => assetType !== param.assetIn && assetType !== param.assetOut
             );
 
         txb.moveCall({
@@ -333,13 +335,13 @@ export class RAMMSuiPool {
             arguments: [
                 txb.object(this.poolAddress),
                 txb.object(SUI_CLOCK_OBJECT_ID),
-                txb.pure(amountIn),
+                txb.pure(param.amountIn),
                 assetInAggregator,
                 assetOutAggregator,
             ].concat(assetAggregators),
             typeArguments: [
-                assetIn,
-                assetOut,
+                param.assetIn,
+                param.assetOut,
             ].concat(otherAssetTypes),
         });
 
