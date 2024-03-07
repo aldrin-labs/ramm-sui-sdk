@@ -33,7 +33,7 @@ describe('Trade amount out of RAMM', () => {
         const poolConfig = suiTestnet[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log('Running test fror: ' + ramm.name);
+        console.log('Running test for: ' + ramm.name);
 
         /**
          * Request SUI from the testnet's faucet.

@@ -2,11 +2,11 @@ import { suiConfigs } from "../src/constants";
 import { RAMMSuiPool } from "../src/types";
 import {
     TESTNET,
-    PriceEstimationEvent,
+    PriceEstimationEvent, TradeEvent,
     rammMiscFaucet, testKeypair
 } from "./utils";
 
-import { getFullnodeUrl, SuiClient, SuiEvent, SuiObjectChange } from '@mysten/sui.js/client';
+import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
 import { assert, describe, expect, test } from 'vitest';
@@ -43,7 +43,7 @@ describe('Trade amount into RAMM', () => {
 
         // This is 1 DOT, to be used for the trade.
         const dotAmount: number = 100_000_000;
-        const txb = ramm.estimatePriceTradeAmountIn(
+        const estimate_txb = ramm.estimatePriceTradeAmountIn(
             {
                 assetIn: dotType,
                 assetOut: adaType,
@@ -52,10 +52,42 @@ describe('Trade amount into RAMM', () => {
         );
         const devInspectRes = await suiClient.devInspectTransactionBlock({
             sender: testKeypair.toSuiAddress(),
-            transactionBlock: txb,
+            transactionBlock: estimate_txb,
         });
 
-        console.log(devInspectRes.events[0].parsedJson as PriceEstimationEvent);
+        const priceEstimationEventJSON = devInspectRes.events[0].parsedJson as PriceEstimationEvent;
+
+/*         const txb = new TransactionBlock();
+        // This is 1 DOT, to be used for the trade.
+        const coin = txb.moveCall({
+            target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
+            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(dotAmount)],
+            typeArguments: [dotType]
+        });
+        ramm.tradeAmountIn(
+            txb,
+            {
+                assetIn: dotType,
+                assetOut: adaType,
+                amountIn: coin,
+                // any ADA is fine
+                minAmountOut: 1,
+            }
+        );
+
+        let resp = await suiClient.signAndExecuteTransactionBlock({
+            signer: testKeypair,
+            transactionBlock: txb,
+            options: {
+                // required, so that we can scrutinize the response's events for a trade
+                showEvents: true
+            }
+        });
+
+        const tradeInEvent = resp.events![0] as SuiEvent;
+        const tradeInEventJSON = tradeInEvent.parsedJson as TradeEvent;
+
+        assert.equal() */
 
     }, /** timeout for the test, in ms */ 500);
 });

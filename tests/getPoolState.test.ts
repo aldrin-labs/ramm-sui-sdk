@@ -35,7 +35,7 @@ describe('Pool state query', () => {
         const poolConfig = suiTestnet[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log(ramm);
+        console.log('Running test for: ' + ramm.name);
 
         /**
          * Request SUI from the testnet's faucet.

@@ -3,7 +3,7 @@ import { RAMMSuiPool } from "../src/types";
 import {
     TESTNET,
     TradeEvent,
-    rammMiscFaucet, sleep, testKeypair
+    rammMiscFaucet, testKeypair
 } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent, SuiObjectChange } from '@mysten/sui.js/client';
@@ -119,6 +119,8 @@ describe('Trade amount into RAMM', () => {
 
         const tradeInEvent = resp.events![0] as SuiEvent;
         const tradeInEventJSON = tradeInEvent.parsedJson as TradeEvent;
+
+        console.log(tradeInEventJSON);
 
         assert.equal(tradeInEventJSON.ramm_id, ramm.poolAddress);
         assert.equal(tradeInEventJSON.trader, testKeypair.toSuiAddress());

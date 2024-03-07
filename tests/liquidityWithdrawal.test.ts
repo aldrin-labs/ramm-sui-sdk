@@ -1,7 +1,7 @@
 import { suiConfigs } from "../src/constants";
 import { RAMMSuiPool } from "../src/types";
 import {
-    LiquidityWithdrawalEvent, RAMMMiscFaucet,
+    LiquidityWithdrawalEvent,
     TESTNET,
     rammMiscFaucet, sleep, testKeypair
 } from "./utils";
@@ -34,7 +34,7 @@ describe('Liquidity withdrawal', () => {
         const poolConfig = suiTestnet[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
-        console.log(ramm);
+        console.log('Running test for: ' + ramm.name);
 
         /**
          * Request SUI from the testnet's faucet.
