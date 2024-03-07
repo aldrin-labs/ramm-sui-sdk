@@ -293,6 +293,15 @@ export class RAMMSuiPool {
         });
     }
 
+    /**
+     * Create a PTB to estimate a trade's price and fee.
+     *
+     * @param param.assetIn The Sui Move type of the asset that would be going into the pool.
+     * @param param.assetOut The Sui Move type of the asset that would be coming out of the pool.
+     * @param param.amountIn The hypothetical trade's amount
+     * @returns The transaction block containing the price estimation's `moveCall`. It can then be
+     * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
+     */
     estimatePriceTradeAmountIn(
         param: {
             assetIn: string,
