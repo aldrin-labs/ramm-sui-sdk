@@ -2,7 +2,7 @@
  * Type that represents a `TypeName` from Sui Move, following emission into an event and parsing
  * into JSON.
  */
-type TypeName = {
+export type TypeName = {
     name: string
 }
 
