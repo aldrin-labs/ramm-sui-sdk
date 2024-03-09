@@ -1,18 +1,13 @@
 import { suiConfigs } from "../src/constants";
+import { PoolStateEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
-import {
-    LiquidityDepositEvent,
-    PoolStateEvent,
-    TESTNET,
-    rammMiscFaucet, sleep, testKeypair
-} from "./utils";
+import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
-import exp from "constants";
 
-import { assert, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 describe('Pool state query', () => {
     test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a BTC/ETH/SOL RAMM pool', async () => {

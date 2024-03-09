@@ -1,10 +1,7 @@
 import { suiConfigs } from "../src/constants";
+import { PriceEstimationEvent, TradeEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
-import {
-    TESTNET,
-    PriceEstimationEvent, TradeEvent,
-    rammMiscFaucet, testKeypair
-} from "./utils";
+import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
@@ -95,8 +92,8 @@ describe('Sell trade price estimation', () => {
         console.log('Estimation: 1 DOT would buy ' + ada_per_dot_price_est + ' ADA');
         const dot_per_ada_actual_price: number = tradeInEventJSON.amount_out / tradeInEventJSON.amount_in;
         const ada_per_dot_actual_price: number = tradeInEventJSON.amount_in / tradeInEventJSON.amount_out;
-        console.log('Actual price: 1 DOT bought ' + dot_per_ada_actual_price + ' ADA');
-        console.log('Actual price: 1 ADA bought ' + ada_per_dot_actual_price + ' DOT');
+        console.log('Actual price: 1 ADA buys ' + dot_per_ada_actual_price + ' DOT');
+        console.log('Actual price: 1 DOT buys ' + ada_per_dot_actual_price + ' ADA');
         console.log('Ammt used in estimation: ' + priceEstimationEventJSON.amount_in);
         console.log('Amnt used in actual trade: ' + tradeInEventJSON.amount_in);
 

@@ -1,10 +1,7 @@
 import { suiConfigs } from "../src/constants";
+import { TradeEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
-import {
-    TESTNET,
-    TradeEvent,
-    rammMiscFaucet, testKeypair
-} from "./utils";
+import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent, SuiObjectChange } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
