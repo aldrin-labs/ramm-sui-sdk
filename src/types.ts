@@ -1,4 +1,3 @@
-import { DevInspectResults, SuiClient } from '@mysten/sui.js/dist/cjs/client';
 import { TransactionBlock, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 
@@ -294,15 +293,16 @@ export class RAMMSuiPool {
     }
 
     /**
-     * Create a PTB to estimate a trade's price and fee.
+     * Create a PTB to estimate a trade's price and fee, given a base asset, a quote asset,
+     * and the quantityt of the base asset.
      *
      * @param param.assetIn The Sui Move type of the asset that would be going into the pool.
      * @param param.assetOut The Sui Move type of the asset that would be coming out of the pool.
-     * @param param.amountIn The hypothetical trade's amount
+     * @param param.amountIn The amount of the hypothetical trade's base asset
      * @returns The transaction block containing the price estimation's `moveCall`. It can then be
      * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
      */
-    estimatePriceTradeAmountIn(
+    estimatePriceWithAmountIn(
         param: {
             assetIn: string,
             assetOut: string,

@@ -1,10 +1,7 @@
 import { suiConfigs } from "../src/constants";
+import { PriceEstimationEvent, TradeEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
-import {
-    TESTNET,
-    PriceEstimationEvent, TradeEvent,
-    rammMiscFaucet, testKeypair
-} from "./utils";
+import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
@@ -45,7 +42,7 @@ describe('Sell trade price estimation', () => {
         const dotAmount: number = 50_000_000;
         // We'd like about 6.5 ADA for half a DOT.
         const adaAmount: number = 650_000_000;
-        const estimate_txb = ramm.estimatePriceTradeAmountIn(
+        const estimate_txb = ramm.estimatePriceWithAmountIn(
             {
                 assetIn: dotType,
                 assetOut: adaType,
@@ -96,8 +93,8 @@ describe('Sell trade price estimation', () => {
         console.log('Estimation: 1 ADA would buy ' + ada_per_dot_price_est + ' DOT');
         const dot_per_ada_actual_price: number = tradeInEventJSON.amount_out / tradeInEventJSON.amount_in;
         const ada_per_dot_actual_price: number = tradeInEventJSON.amount_in / tradeInEventJSON.amount_out;
-        console.log('Actual price: 1 DOT bought ' + dot_per_ada_actual_price + ' ADA');
-        console.log('Actual price: 1 ADA bought ' + ada_per_dot_actual_price + ' DOT');
+        console.log('Actual price: 1 DOT buys ' + dot_per_ada_actual_price + ' ADA');
+        console.log('Actual price: 1 ADA buys ' + ada_per_dot_actual_price + ' DOT');
         console.log('Ammt used in estimation: ' + priceEstimationEventJSON.amount_in);
         console.log('Amnt used in actual trade: ' + tradeInEventJSON.amount_in);
 

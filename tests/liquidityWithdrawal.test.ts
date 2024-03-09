@@ -1,10 +1,7 @@
 import { suiConfigs } from "../src/constants";
+import { LiquidityWithdrawalEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
-import {
-    LiquidityWithdrawalEvent,
-    TESTNET,
-    rammMiscFaucet, sleep, testKeypair
-} from "./utils";
+import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/types/objects";

@@ -1,10 +1,7 @@
 import { suiConfigs } from "../src/constants";
+import { TradeEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
-import {
-    TESTNET,
-    TradeEvent,
-    rammMiscFaucet, sleep, testKeypair
-} from "./utils";
+import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';

@@ -1,4 +1,4 @@
-import { RAMMSuiPool, RAMMSuiPoolConfig } from "./types";
+import { RAMMSuiPoolConfig } from "./types";
 
 export type SuiSupportedNetworks = 'suiTestnet' | 'suiMainnet';
 
