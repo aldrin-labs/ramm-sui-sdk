@@ -17,12 +17,12 @@ export type LiquidityDepositEvent = {
     lpt: number,
 }
 
-type LiqWthdrwDict = {
+export type LiqWthdrwDict = {
     key: TypeName,
     value: number,
 }
 
-type Contents = {
+export type Contents = {
     contents: LiqWthdrwDict[],
 }
 
