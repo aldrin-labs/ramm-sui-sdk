@@ -43,7 +43,7 @@ describe('Sell trade price estimation', () => {
 
         // This is 1 ADA, to be used for the trade.
         const adaAmount: number = 100_000_000;
-        const estimate_txb = ramm.estimatePriceTradeAmountIn(
+        const estimate_txb = ramm.estimatePriceWithAmountIn(
             {
                 assetIn: adaType,
                 assetOut: dotType,
