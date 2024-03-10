@@ -2,14 +2,14 @@
  * Type that represents a `TypeName` from Sui Move, following emission into an event and parsing
  * into JSON.
  */
-type TypeName = {
+export type TypeName = {
     name: string
 }
 
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's liquidity deposit.
  */
-type LiquidityDepositEvent = {
+export type LiquidityDepositEvent = {
     ramm_id: string,
     trader: string,
     token_in: TypeName,
@@ -17,19 +17,19 @@ type LiquidityDepositEvent = {
     lpt: number,
 }
 
-type LiqWthdrwDict = {
+export type LiqWthdrwDict = {
     key: TypeName,
     value: number,
 }
 
-type Contents = {
+export type Contents = {
     contents: LiqWthdrwDict[],
 }
 
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's liquidity withdrawal.
  */
-type LiquidityWithdrawalEvent = {
+export type LiquidityWithdrawalEvent = {
     ramm_id: string,
     trader: string,
     token_out: TypeName,
@@ -41,7 +41,7 @@ type LiquidityWithdrawalEvent = {
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's inbound/outbound trades.
  */
-type TradeEvent = {
+export type TradeEvent = {
     ramm_id: string,
     trader: string,
     token_in: TypeName,
@@ -54,7 +54,7 @@ type TradeEvent = {
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's pool state query.
  */
-type PoolStateEvent = {
+export type PoolStateEvent = {
     ramm_id: string,
     sender: string,
     asset_types: TypeName[],
@@ -70,7 +70,7 @@ type PoolStateEvent = {
  * This structure can be obtained from using `ramm_sui::interface{n}::trade_price_estimate_{n}`
  * to estimate the price of a potencial trade with the RAMM.
  */
-type PriceEstimationEvent = {
+export type PriceEstimationEvent = {
     ramm_id: string,
     trader: string,
     token_in: TypeName,
@@ -78,17 +78,4 @@ type PriceEstimationEvent = {
     amount_in: number,
     amount_out: number,
     protocol_fee: number,
-}
-
-export type {
-    TypeName,
-    LiquidityDepositEvent,
-
-    LiquidityWithdrawalEvent,
-    LiqWthdrwDict,
-    Contents,
-
-    TradeEvent,
-    PoolStateEvent,
-    PriceEstimationEvent,
 }
