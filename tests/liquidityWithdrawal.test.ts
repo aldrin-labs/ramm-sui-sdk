@@ -1,4 +1,4 @@
-import { suiConfigs } from "../src/constants";
+import { suiConfigs } from "../src/consts";
 import { LiquidityWithdrawalEvent, RAMMSuiPool } from "../src/types";
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
