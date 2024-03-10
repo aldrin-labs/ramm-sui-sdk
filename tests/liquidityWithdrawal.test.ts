@@ -1,10 +1,10 @@
 import { suiConfigs } from "../src/constants";
 import { LiquidityWithdrawalEvent } from "../src/events";
-import { RAMMSuiPool } from "../src/types";
+import { RAMMSuiPool } from "../src/ramm-sui";
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
-import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/types/objects";
+import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/ramm-sui/objects";
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { Inputs, TransactionBlock } from '@mysten/sui.js/transactions';
 

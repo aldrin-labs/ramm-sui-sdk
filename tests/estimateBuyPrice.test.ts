@@ -1,6 +1,6 @@
 import { suiConfigs } from "../src/constants";
 import { PriceEstimationEvent, TradeEvent } from "../src/events";
-import { RAMMSuiPool } from "../src/types";
+import { RAMMSuiPool } from "../src/ramm-sui";
 import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
