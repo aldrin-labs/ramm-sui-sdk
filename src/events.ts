@@ -1,12 +1,3 @@
-export type {
-    TypeName,
-    LiquidityDepositEvent,
-    LiquidityWithdrawalEvent,
-    TradeEvent,
-    PoolStateEvent,
-    PriceEstimationEvent,
-}
-
 /**
  * Type that represents a `TypeName` from Sui Move, following emission into an event and parsing
  * into JSON.
@@ -87,4 +78,17 @@ type PriceEstimationEvent = {
     amount_in: number,
     amount_out: number,
     protocol_fee: number,
+}
+
+export type {
+    TypeName,
+    LiquidityDepositEvent,
+
+    LiquidityWithdrawalEvent,
+    LiqWthdrwDict,
+    Contents,
+
+    TradeEvent,
+    PoolStateEvent,
+    PriceEstimationEvent,
 }
