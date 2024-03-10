@@ -1,5 +1,4 @@
-import { suiConfigs } from "../src/consts";
-import { LiquidityDepositEvent, RAMMSuiPool } from "../src/types";
+import { LiquidityDepositEvent, RAMMSuiPool, suiConfigs } from "../src/types";
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
