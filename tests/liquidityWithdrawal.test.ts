@@ -3,7 +3,7 @@ import { LiquidityWithdrawalEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
-import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { OwnedObjectRef } from "@mysten/sui.js/dist/cjs/types/objects";
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { Inputs, TransactionBlock } from '@mysten/sui.js/transactions';
@@ -102,7 +102,7 @@ describe('Liquidity withdrawal', () => {
             }
         });
 
-        const liqWithEvent = resp.events![0] as SuiEvent;
+        const liqWithEvent = resp.events![0];
         const liqWithEventJSON = liqWithEvent.parsedJson as LiquidityWithdrawalEvent;
 
         console.log(JSON.stringify(liqWithEventJSON, null, 4));

@@ -3,7 +3,7 @@ import { TradeEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
-import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
@@ -130,7 +130,7 @@ describe('Trade amount out of RAMM', () => {
             }
         });
 
-        const tradeOutEvent = resp.events![0] as SuiEvent;
+        const tradeOutEvent = resp.events![0];
         const tradeOutEventJSON = tradeOutEvent.parsedJson as TradeEvent;
 
         console.log(tradeOutEventJSON);

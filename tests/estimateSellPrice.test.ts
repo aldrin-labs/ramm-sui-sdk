@@ -3,10 +3,10 @@ import { PriceEstimationEvent, TradeEvent } from "../src/events";
 import { RAMMSuiPool } from "../src/types";
 import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 
-import { getFullnodeUrl, SuiClient, SuiEvent } from '@mysten/sui.js/client';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-import { assert, describe, expect, test } from 'vitest';
+import { describe, test } from 'vitest';
 
 describe('Sell trade price estimation', () => {
     test('Estimate price of sell trade using, using the SDK', async () => {
@@ -80,7 +80,7 @@ describe('Sell trade price estimation', () => {
             }
         });
 
-        const tradeInEvent = resp.events![0] as SuiEvent;
+        const tradeInEvent = resp.events![0];
         const tradeInEventJSON = tradeInEvent.parsedJson as TradeEvent;
 
         console.log(priceEstimationEventJSON);

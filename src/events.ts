@@ -1,15 +1,24 @@
+export type {
+    TypeName,
+    LiquidityDepositEvent,
+    LiquidityWithdrawalEvent,
+    TradeEvent,
+    PoolStateEvent,
+    PriceEstimationEvent,
+}
+
 /**
  * Type that represents a `TypeName` from Sui Move, following emission into an event and parsing
  * into JSON.
  */
-export type TypeName = {
+type TypeName = {
     name: string
 }
 
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's liquidity deposit.
  */
-export type LiquidityDepositEvent = {
+type LiquidityDepositEvent = {
     ramm_id: string,
     trader: string,
     token_in: TypeName,
@@ -17,19 +26,19 @@ export type LiquidityDepositEvent = {
     lpt: number,
 }
 
-export type LiqWthdrwDict = {
+type LiqWthdrwDict = {
     key: TypeName,
     value: number,
 }
 
-export type Contents = {
+type Contents = {
     contents: LiqWthdrwDict[],
 }
 
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's liquidity withdrawal.
  */
-export type LiquidityWithdrawalEvent = {
+type LiquidityWithdrawalEvent = {
     ramm_id: string,
     trader: string,
     token_out: TypeName,
@@ -41,7 +50,7 @@ export type LiquidityWithdrawalEvent = {
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's inbound/outbound trades.
  */
-export type TradeEvent = {
+type TradeEvent = {
     ramm_id: string,
     trader: string,
     token_in: TypeName,
@@ -54,7 +63,7 @@ export type TradeEvent = {
 /**
  * Structure representing the Sui Move event, in JSON, of a RAMM's pool state query.
  */
-export type PoolStateEvent = {
+type PoolStateEvent = {
     ramm_id: string,
     sender: string,
     asset_types: TypeName[],
@@ -70,7 +79,7 @@ export type PoolStateEvent = {
  * This structure can be obtained from using `ramm_sui::interface{n}::trade_price_estimate_{n}`
  * to estimate the price of a potencial trade with the RAMM.
  */
-export type PriceEstimationEvent = {
+type PriceEstimationEvent = {
     ramm_id: string,
     trader: string,
     token_in: TypeName,
