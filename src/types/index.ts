@@ -1,3 +1,3 @@
 export * from './events'
-export * from './pool-configs';
+export * from './config-type';
 export * from './ramm-sui'

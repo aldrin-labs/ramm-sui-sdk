@@ -2,6 +2,7 @@ import { SuiSupportedNetworks, RAMMSuiPoolConfigs } from '../types';
 
 /**
  * Map of configurations of currently deployed RAMM Sui pools, keyed by their Sui environment.
+ * @constant
  */
 export const rammSuiConfigs: RAMMSuiPoolConfigs = {
     [SuiSupportedNetworks.testnet]: [
