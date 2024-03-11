@@ -1,6 +1,6 @@
 {
     "name": "@ramm/ramm-sui-sdk",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "TypeScript SDK for the Sui Move RAMM",
     "type": "module",
     "main": "dist/index.js",
