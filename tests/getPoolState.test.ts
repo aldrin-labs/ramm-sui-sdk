@@ -1,4 +1,5 @@
-import { PoolStateEvent, RAMMSuiPool, suiConfigs } from "../src/types";
+import { PoolStateEvent, RAMMSuiPool, SuiSupportedNetworks } from "../src/types";
+import { rammSuiConfigs } from "../src/constants";
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
@@ -19,13 +20,13 @@ describe('Pool state query', () => {
         // create a client connected to the testnet
         const suiClient = new SuiClient({ url: rpcUrl });
 
-        const suiTestnet = suiConfigs.suiTestnet;
-        if (!suiTestnet) {
+        const suiTestnetPools = rammSuiConfigs[SuiSupportedNetworks.testnet];
+        if (!suiTestnetPools) {
             throw new Error('Sui Testnet config not found!');
         }
 
         // Select the BTC/ETH/SOL RAMM
-        const poolConfig = suiTestnet[1];
+        const poolConfig = suiTestnetPools[1];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
         console.log('Running test for: ' + ramm.name);
