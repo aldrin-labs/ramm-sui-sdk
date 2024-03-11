@@ -2,10 +2,13 @@
     "name": "@ramm/ramm-sui-sdk",
     "version": "1.0.0",
     "description": "TypeScript SDK for the Sui Move RAMM",
-    "main": "index.ts",
-    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "/dist"
+    ],
     "scripts": {
-        "build:sdk": "tsup ./index.ts --format cjs,esm --dts --clean",
+        "build:sdk": "tsc",
         "test": "vitest"
     },
     "publishConfig": {
@@ -18,19 +21,10 @@
         "@mysten/sui.js": "^0.50.1",
         "dotenv": "^16.3.2"
     },
-    "compilerOptions": {
-        "module": "node16",
-        "target": "es2023",
-        "strict": true,
-        "verbatimModuleSyntax": true,
-        "declaration": true,
-        "sourceMap": true,
-        "declarationMap": true
-    },
     "devDependencies": {
         "@types/node": "^20.11.5",
         "tsup": "^8.0.1",
         "vitest": "^1.2.1"
     },
-    "packageManager": "yarn@4.0.2"
+    "packageManager": "yarn@4.1.0"
 }
