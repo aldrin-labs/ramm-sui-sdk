@@ -53,6 +53,21 @@ describe('Sell trade price estimation', () => {
 
         const priceEstimationEventJSON = devInspectRes.events[0].parsedJson as PriceEstimationEvent;
 
+        const adaAmount2: number = adaAmount * 10_000;
+        const estimate_txb2 = ramm.estimatePriceWithAmountIn(
+            {
+                assetIn: adaType,
+                assetOut: dotType,
+                amountIn: adaAmount2,
+            }
+        );
+        const devInspectRes2 = await suiClient.devInspectTransactionBlock({
+            sender: testKeypair.toSuiAddress(),
+            transactionBlock: estimate_txb2,
+        });
+
+        const priceEstimationEventJSON2 = devInspectRes2.events[0].parsedJson as PriceEstimationEvent;
+
         const txb = new TransactionBlock();
         const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
@@ -89,6 +104,12 @@ describe('Sell trade price estimation', () => {
         const ada_per_dot_price_est: number = priceEstimationEventJSON.amount_in / priceEstimationEventJSON.amount_out;
         console.log('Estimation: 1 ADA would buy ' + dot_per_ada_price_est + ' DOT');
         console.log('Estimation: 1 DOT would buy ' + ada_per_dot_price_est + ' ADA');
+
+        const dot_per_ada_price_est2: number = priceEstimationEventJSON2.amount_out / priceEstimationEventJSON2.amount_in;
+        const ada_per_dot_price_est2: number = priceEstimationEventJSON2.amount_in / priceEstimationEventJSON2.amount_out;
+        console.log('Second estimation: 1 ADA would buy ' + dot_per_ada_price_est2 + ' DOT');
+        console.log('Second estimation: 1 DOT would buy ' + ada_per_dot_price_est2 + ' ADA');
+
         const dot_per_ada_actual_price: number = tradeInEventJSON.amount_out / tradeInEventJSON.amount_in;
         const ada_per_dot_actual_price: number = tradeInEventJSON.amount_in / tradeInEventJSON.amount_out;
         console.log('Actual price: 1 ADA buys ' + dot_per_ada_actual_price + ' DOT');
