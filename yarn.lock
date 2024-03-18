@@ -271,9 +271,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mysten/sui.js@npm:^0.50.1":
-  version: 0.50.1
-  resolution: "@mysten/sui.js@npm:0.50.1"
+"@mysten/sui.js@npm:^0.51.0":
+  version: 0.51.0
+  resolution: "@mysten/sui.js@npm:0.51.0"
   dependencies:
     "@graphql-typed-document-node/core": "npm:^3.2.0"
     "@mysten/bcs": "npm:0.11.1"
@@ -287,7 +287,7 @@ __metadata:
     graphql: "npm:^16.8.1"
     superstruct: "npm:^1.0.3"
     tweetnacl: "npm:^1.0.3"
-  checksum: 10c0/483ab80935af9da8b02d5ce227fbc9b925750ba1bd9c2e610d1e7894d974e9ee6667d5a1125ab9c987d1f30d7b88f4a054ca07a5cb020e7ff6298d894b8414ae
+  checksum: 10c0/d9198c124ca59f749227ef8a608e112be3e54cfdd373a3c5fec8d20ea0aa8105620f7881b776eb4a1782e4449331d2079dafb831d91478d74959897a2456712d
   languageName: node
   linkType: hard
 
@@ -367,7 +367,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@ramm/ramm-sui-sdk@workspace:."
   dependencies:
-    "@mysten/sui.js": "npm:^0.50.1"
+    "@mysten/sui.js": "npm:^0.51.0"
     "@types/node": "npm:^20.11.5"
     dotenv: "npm:^16.3.2"
     rimraf: "npm:^5.0.5"

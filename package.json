@@ -1,6 +1,6 @@
 {
     "name": "@ramm/ramm-sui-sdk",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "description": "TypeScript SDK for the Sui Move RAMM",
     "type": "module",
     "main": "dist/index.js",
@@ -19,7 +19,7 @@
     "author": "Alexandre Baldé <alexandre@aldrin.com>",
     "license": "AGPL-3.0",
     "dependencies": {
-        "@mysten/sui.js": "^0.50.1",
+        "@mysten/sui.js": "^0.51.0",
         "dotenv": "^16.3.2"
     },
     "devDependencies": {
@@ -28,5 +28,5 @@
         "tsup": "^8.0.1",
         "vitest": "^1.2.1"
     },
-    "packageManager": "yarn@4.1.0"
+    "packageManager": "yarn@4.1.1"
 }
