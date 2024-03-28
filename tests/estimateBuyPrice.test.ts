@@ -1,6 +1,5 @@
-import { suiConfigs } from "../src/constants";
-import { PriceEstimationEvent, TradeEvent } from "../src/events";
-import { RAMMSuiPool } from "../src/types";
+import { PriceEstimationEvent, RAMMSuiPool, SuiSupportedNetworks, TradeEvent } from "../src/types";
+import { rammSuiConfigs } from "../src/constants";
 import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
@@ -20,13 +19,13 @@ describe('Sell trade price estimation', () => {
         // create a client connected to the testnet
         const suiClient = new SuiClient({ url: rpcUrl });
 
-        const suiTestnet = suiConfigs.suiTestnet;
-        if (!suiTestnet) {
+        const suiTestnetPools = rammSuiConfigs[SuiSupportedNetworks.testnet];
+        if (!suiTestnetPools) {
             throw new Error('Sui Testnet config not found!');
         }
 
         // Select the ADA/DOT/SOL RAMM
-        const poolConfig = suiTestnet[0];
+        const poolConfig = suiTestnetPools[0];
         const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
 
         console.log('Running test for: ' + ramm.name);

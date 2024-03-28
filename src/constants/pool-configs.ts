@@ -1,11 +1,11 @@
-import { RAMMSuiPoolConfig } from "./types";
+import { SuiSupportedNetworks, RAMMSuiPoolConfigs } from '../types';
 
-export type SuiSupportedNetworks = 'suiTestnet' | 'suiMainnet';
-
-export type SuiNetworkConfigs = Record<SuiSupportedNetworks, RAMMSuiPoolConfig[] | undefined>;
-
-export const suiConfigs: SuiNetworkConfigs = {
-    suiTestnet: [
+/**
+ * Map of configurations of currently deployed RAMM Sui pools, keyed by their Sui environment.
+ * @constant
+ */
+export const rammSuiConfigs: RAMMSuiPoolConfigs = {
+    [SuiSupportedNetworks.testnet]: [
         {
             name: 'Sui Testnet ADA/DOT/SOL RAMM',
             packageId: '0xd3283fa556731370cd2a7f389b3e35c630184118b5af416ce9e57edfce751496',
@@ -80,6 +80,42 @@ export const suiConfigs: SuiNetworkConfigs = {
             ],
         }
     ],
-    suiMainnet: []
-};
+    [SuiSupportedNetworks.mainnet]: [
+        {
+            name: 'Sui Mainnet SUI/USDC/USDT RAMM',
+            packageId: '0xd4e097d82d73dc5d152f277bd17ba7980cad4c0b238c3609517cbd0cf686ddd1',
+            moduleName: 'ramm',
+            poolAddress: '0x4ee5425220bc12f2ff633d37b1dc1eb56cc8fd96b1c72c49bd4ce6e895bd6cd7',
+            assetCount: 3,
 
+            assetTypeIndices: new Map([
+                ['0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI', 0],
+                ['0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN', 1],
+                ['0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN', 2],
+            ]),
+            assetConfigs: [
+                {
+                    assetAggregator: '0xbca474133638352ba83ccf7b5c931d50f764b09550e16612c9f70f1e21f3f594',
+                    assetType: '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI',
+                    assetTicker: 'SUI',
+                    assetDecimalPlaces: 9,
+                    minimumTradeAmount: 10_000_000,
+                },
+                {
+                    assetAggregator: '0x456efc067f5b4d7fe4a4c561f6937e14b95969d3b4cecd7ee94eedd01499f94a',
+                    assetType: '0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN',
+                    assetTicker: 'USDC',
+                    assetDecimalPlaces: 6,
+                    minimumTradeAmount: 10_000,
+                },
+                {
+                    assetAggregator: '0xbe4fcb111eaeb7abb698063c47566447f921e3cc76b33b48265f4c91cf1c645a',
+                    assetType: '0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN',
+                    assetTicker: 'USDT',
+                    assetDecimalPlaces: 6,
+                    minimumTradeAmount: 10_000,
+                },
+            ],
+        }
+    ]
+};
