@@ -9,6 +9,7 @@
     ],
     "scripts": {
         "build": "yarn rimraf ./dist/; tsc",
+        "prepublish": "yarn run build",
         "test": "vitest"
     },
     "publishConfig": {
