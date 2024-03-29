@@ -34,6 +34,8 @@ export class RAMMSuiPoolConfig {
     assetTypeIndices: Map<string, number>;
     assetConfigs: AssetConfig[];
 
+    precisionDecimalPlaces?: number;
+    maxPrecisionDecimalPlaces?: number;
     delta?: number;
     baseFee?: number;
     baseLeverage?: number;
@@ -76,6 +78,20 @@ export class RAMMSuiPool {
     assetConfigs: AssetConfig[];
 
     /**
+     * The number of decimal places of precision the pool uses in its internal calculations.
+     *
+     * Positive integer \in [9, 25], default is 12.
+     */
+    precisionDecimalPlaces: number;
+
+    /**
+     * The maximum number of decimal places of precision the pool can use in its internal calculations.
+     *
+     * Positive integer \in [9, 25], default is 25. Must be equal to or greater than `precisionDecimalPlaces`.
+     */
+    maxPrecisionDecimalPlaces: number;
+
+    /**
      * The pool's permitted deviation from base imbalance ratio of 1: - real number \in [0, 1[.
      */
     delta: number;
@@ -109,6 +125,8 @@ export class RAMMSuiPool {
             assetCount,
             assetTypeIndices,
             assetConfigs,
+            precisionDecimalPlaces = 12,
+            maxPrecisionDecimalPlaces = 25,
             delta = 0.25,
             baseFee = 0.001,
             baseLeverage = 100,
@@ -129,6 +147,8 @@ export class RAMMSuiPool {
         this.assetTypeIndices = assetTypeIndices;
         this.assetConfigs = assetConfigs;
 
+        this.precisionDecimalPlaces = precisionDecimalPlaces;
+        this.maxPrecisionDecimalPlaces = maxPrecisionDecimalPlaces;
         this.delta = delta;
         this.baseFee = baseFee;
         this.baseLeverage = baseLeverage;
