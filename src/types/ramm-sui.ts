@@ -456,4 +456,41 @@ export class RAMMSuiPool {
             arguments: [txb.object(this.poolAddress)],
         });
     }
+
+    /**
+     * Create a PTB to obtain a pool's current imbalance ratios.
+     *
+     * The Sui Move event emitted by the Move call will contain the ratios scaled with the pool's
+     * decimal places of precision (`const` defined in `ramm.move`).
+     *
+     * The ratios can be scaled back by the consuming application.
+     *
+     * @returns The transaction block containing the imbalance ratio emission `moveCall`. It can then be
+     * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
+     */
+    getPoolImbalanceRatios(): TransactionBlock {
+        const txb = new TransactionBlock();
+
+        const assetAggregators = this.assetConfigs.map(
+            (assetConfig) => {
+                let str = assetConfig.assetAggregator;
+                return txb.object(str);
+            }
+        );
+
+        const assetTypes: string[] = this
+            .assetConfigs
+            .map((assetConfig) => assetConfig.assetType);
+
+        txb.moveCall({
+            target: `${this.packageId}::interface${this.assetCount}::imbalance_ratios_event_${this.assetCount}`,
+            arguments: [
+                txb.object(this.poolAddress),
+                txb.object(SUI_CLOCK_OBJECT_ID),
+            ].concat(assetAggregators),
+            typeArguments: assetTypes,
+        });
+
+        return txb
+    }
 }
