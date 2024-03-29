@@ -8,7 +8,7 @@ export const rammSuiConfigs: RAMMSuiPoolConfigs = {
     [SuiSupportedNetworks.testnet]: [
         {
             name: 'Sui Testnet ADA/DOT/SOL RAMM',
-            packageId: '0xd3283fa556731370cd2a7f389b3e35c630184118b5af416ce9e57edfce751496',
+            packageId: '0xb93c139768a9dfdb6898475052be3ac1d93b92dccf2288c96a8e227f3e511ef6',
             moduleName: 'ramm',
             poolAddress: '0x1eefca843bb1779bc87689169a732eef268d979b1f0ac0b560d0f8af66d23eed',
             assetCount: 3,
@@ -45,7 +45,7 @@ export const rammSuiConfigs: RAMMSuiPoolConfigs = {
 
         {
             name: 'Sui Testnet BTC/ETH/SOL RAMM',
-            packageId: '0xd3283fa556731370cd2a7f389b3e35c630184118b5af416ce9e57edfce751496',
+            packageId: '0xb93c139768a9dfdb6898475052be3ac1d93b92dccf2288c96a8e227f3e511ef6',
             moduleName: 'ramm',
             poolAddress: '0xf47a4d16f93e957f9fc5a24997ba1a22ae41cfe37231fdf148419d218681b5e5',
             assetCount: 3,
