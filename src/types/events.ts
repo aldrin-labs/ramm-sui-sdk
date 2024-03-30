@@ -86,7 +86,7 @@ export type ImbRatioDict = {
 }
 
 export type ImbRatioContents = {
-    contents: LiqWthdrwDict[],
+    contents: ImbRatioDict[],
 }
 
 export type ImbalanceRatioEvent = {
