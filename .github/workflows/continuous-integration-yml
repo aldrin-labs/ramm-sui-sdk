@@ -16,5 +16,4 @@ jobs:
             - name: Build `ramm-sui-sdk` repository
               run: |
                   cd ${{ github.workspace }}
-                  cd ./ramm-sui-sdk
                   yarn build
