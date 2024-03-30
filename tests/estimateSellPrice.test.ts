@@ -34,7 +34,7 @@ describe('Sell trade price estimation', () => {
         const dotType: string = `0x${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::DOT`;
 
         /*
-        Onto the trade - perform the DOT "sell" trade using the SDK
+        Onto the trade - perform the ADA "sell" trade using the SDK
         */
 
         // This is 1 ADA, to be used for the trade.
