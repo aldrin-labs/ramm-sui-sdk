@@ -10,11 +10,15 @@ jobs:
     ramm-sui-sdk-main-job:
         name: Build and test `ramm-sui-sdk`
         runs-on: ubuntu-latest
-        environment: default
+        #environment: default
+        env:
+            RAMM_SUI_SDK_PRIVATE_KEY: ${{ secrets.RAMM_SUI_SDK_PRIVATE_KEY }}
+            RAMM_SUI_SDK_GITLAB_AUTH_TOKEN: ${{ secrets.RAMM_SUI_SDK_GITLAB_AUTH_TOKEN }}
         steps:
             - name: Fetch `ramm-sui-sdk` repository
               uses: actions/checkout@v4
             - name: Build `ramm-sui-sdk` repository
               run: |
                   cd ${{ github.workspace }}
+                  yarn install
                   yarn build
