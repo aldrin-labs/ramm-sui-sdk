@@ -5,7 +5,7 @@ import { TESTNET, rammMiscFaucet, testKeypair } from "./utils";
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-import { describe, test } from 'vitest';
+import { assert, describe, expect, test } from 'vitest';
 
 describe('Imbalance ratio query', () => {
     test('Retrieve imbalance ratios of ADA/DOT/SOL pool using the SDK', async () => {
@@ -42,7 +42,21 @@ describe('Imbalance ratio query', () => {
 
         const imbalanceRatioEventJSON = devInspectRes.events[0].parsedJson as ImbalanceRatioEvent;
 
-        console.log('Imbalance ratios:');
-        console.log(JSON.stringify(imbalanceRatioEventJSON, null, 4));
+        console.log('Imbalance ratio event: ' + JSON.stringify(imbalanceRatioEventJSON, null, 4));
+
+        assert.equal(imbalanceRatioEventJSON.ramm_id, ramm.poolAddress);
+        assert.equal(imbalanceRatioEventJSON.requester, testKeypair.toSuiAddress());
+
+        let i = 0;
+        while (i < imbalanceRatioEventJSON.imb_ratios.contents.length) {
+            let value = Number(imbalanceRatioEventJSON.imb_ratios.contents[i].value)
+            value = Number(value)
+            // imbalance ratios come with the RAMM's precision of decimal places, so scaling them back
+            // to a real between 0 and 2 is required.
+            value /= (10 ** ramm.precisionDecimalPlaces)
+            expect(value).toBeGreaterThan(1 - ramm.delta)
+            expect(value).toBeLessThan(1 + ramm.delta)
+            i++
+        }
     }, /** timeout for the test, in ms */ 5_000);
 });
