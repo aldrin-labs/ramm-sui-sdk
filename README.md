@@ -10,7 +10,7 @@
 
 `yarn test`
 
-Note that tests require a `PRIVATE_KEY` variable present in the shell's environment.
+Note that tests require a `RAMM_SUI_SDK_PRIVATE_KEY` variable present in the shell's environment.
 The key must have a sufficient `Coin<SUI>` balance for trades - in the testnet.
 
 # License

@@ -15,12 +15,12 @@ export const TESTNET: "testnet" | "devnet" | "localnet" = 'testnet';
 
 /**
  * Read this repository's `.env` file, and return the `Secp256r1Keypair` associated with the
- * `.env`'s `PRIVATE_KEY` field.
+ * current environment's `RAMM_SUI_SDK_PRIVATE_KEY` field.
  *
  * @returns An `Secp256r1Keypair`, gotten from Suibase, and with `Coin<SUI>` objects. 
  */
 const getKeypair = function (): Secp256k1Keypair {
-    const privateKey = process.env.PRIVATE_KEY as string;
+    const privateKey = process.env.RAMM_SUI_SDK_PRIVATE_KEY as string;
     let secret_key = Uint8Array.from(atob(privateKey), c => c.charCodeAt(0));
 
     // See https://github.com/MystenLabs/sui/blob/818406c5abdf7de1b80915a0519071eec3a5b1c7/crates/sui-types/src/crypto.rs#L1650
