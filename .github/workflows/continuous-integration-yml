@@ -1,0 +1,20 @@
+name: Build `ramm-sui-sdk`, and run its end-to-end tests
+run-name: GitHub Actions CI for `ramm-sui-sdk`
+on:
+    push:
+      branches:
+        - 'main'
+    pull_request:
+
+jobs:
+    ramm-sui-sdk-main-job:
+        name: Build and test `ramm-sui-sdk`
+        runs-on: ubuntu-latest
+        steps:
+            - name: Fetch `ramm-sui-sdk` repository
+              uses: actions/checkout@v4
+            - name: Build `ramm-sui-sdk` repository
+              run: |
+                  cd ${{ github.workspace }}
+                  cd ./ramm-sui-sdk
+                  yarn build
