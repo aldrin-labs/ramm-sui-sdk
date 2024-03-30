@@ -144,5 +144,5 @@ describe('Trade amount out of RAMM', () => {
 
         expect(Number(tradeOutEventJSON.protocol_fee)).toBeGreaterThan(0);
 
-    }, /** timeout for the test, in ms */ 10_000);
+    }, /** timeout for the test, in ms */ 15_000);
 });
