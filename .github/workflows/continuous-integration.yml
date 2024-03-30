@@ -10,6 +10,7 @@ jobs:
     ramm-sui-sdk-main-job:
         name: Build and test `ramm-sui-sdk`
         runs-on: ubuntu-latest
+        environment: default
         steps:
             - name: Fetch `ramm-sui-sdk` repository
               uses: actions/checkout@v4
