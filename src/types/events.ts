@@ -22,7 +22,7 @@ export type LiqWthdrwDict = {
     value: number,
 }
 
-export type Contents = {
+export type LiqWthdrwContents = {
     contents: LiqWthdrwDict[],
 }
 
@@ -34,8 +34,8 @@ export type LiquidityWithdrawalEvent = {
     trader: string,
     token_out: TypeName,
     lpt: number,
-    amounts_out: Contents,
-    fees: Contents
+    amounts_out: LiqWthdrwContents,
+    fees: LiqWthdrwContents
 }
 
 /**
@@ -78,4 +78,19 @@ export type PriceEstimationEvent = {
     amount_in: number,
     amount_out: number,
     protocol_fee: number,
+}
+
+export type ImbRatioDict = {
+    key: TypeName,
+    value: number,
+}
+
+export type ImbRatioContents = {
+    contents: LiqWthdrwDict[],
+}
+
+export type ImbalanceRatioEvent = {
+    ramm_id: string,
+    requester: string,
+    imb_ratios: ImbRatioContents
 }
