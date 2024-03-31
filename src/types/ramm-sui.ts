@@ -468,9 +468,7 @@ export class RAMMSuiPool {
      * @returns The transaction block containing the imbalance ratio emission `moveCall`. It can then be
      * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
      */
-    getPoolImbalanceRatios(): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    getPoolImbalanceRatios(txb: TransactionBlock): TransactionBlock {
         const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
