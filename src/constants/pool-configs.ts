@@ -83,9 +83,9 @@ export const rammSuiConfigs: RAMMSuiPoolConfigs = {
     [SuiSupportedNetworks.mainnet]: [
         {
             name: 'Sui Mainnet SUI/USDC/USDT RAMM',
-            packageId: '0xd4e097d82d73dc5d152f277bd17ba7980cad4c0b238c3609517cbd0cf686ddd1',
+            packageId: '0xcb6640194b37023f6bed705f40ff22883eb6007d4c69e72c317c64671f9f6b29',
             moduleName: 'ramm',
-            poolAddress: '0xcb6640194b37023f6bed705f40ff22883eb6007d4c69e72c317c64671f9f6b29',
+            poolAddress: '0x4ee5425220bc12f2ff633d37b1dc1eb56cc8fd96b1c72c49bd4ce6e895bd6cd7',
             assetCount: 3,
 
             assetTypeIndices: new Map([
