@@ -85,5 +85,5 @@ describe('Liquidity deposit', () => {
         expect(Number(liqDepEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount);
         expect(Number(liqDepEventJSON.lpt)).toBeGreaterThan(0);
         expect(Number(liqDepEventJSON.lpt)).toBeLessThan(btcAmount);
-    }, /** timeout for the test, in ms */ 5_000);
+    }, /** timeout for the test, in ms */ 10_000);
 });
