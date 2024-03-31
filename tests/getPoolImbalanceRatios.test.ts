@@ -34,10 +34,11 @@ describe('Imbalance ratio query', () => {
         Onto the imbalance ratio query
         */
 
-        const imb_ratios_txb = ramm.getPoolImbalanceRatios();
+        let txb = new TransactionBlock();
+        txb = ramm.getPoolImbalanceRatios(txb);
         const devInspectRes = await suiClient.devInspectTransactionBlock({
             sender: testKeypair.toSuiAddress(),
-            transactionBlock: imb_ratios_txb,
+            transactionBlock: txb,
         });
 
         const imbalanceRatioEventJSON = devInspectRes.events[0].parsedJson as ImbalanceRatioEvent;
