@@ -5,6 +5,9 @@ import { RAMMSuiPool } from "./ramm-sui"
  * Structure representing a RAMM's pool state query, processed from its Sui Move event's JSON.
  *
  * It is a simplified version of the data in the JSON.
+ *
+ * The assets' balances and issued LPT are keyed by their ticker, and scaled to neutral units
+ * e.g. 1 BTC will be represented as `1`, and not `1 * 10 ** BTC.decimalPlaces`.
  */
 export type RAMMPoolState = {
     rammID: string,
@@ -48,7 +51,8 @@ export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: 
 /**
  * Structure representing a RAMM's imbalance ratio data, simplified from its Sui Move event's JSON.
  *
- * Simplification of the data in an imbalance ratio event.
+ * Simplification of the data in an imbalance ratio event: the assets' imbalance ratios are keyed
+ * by their tickers.
  */
 export type RAMMImbalanceRatioData = {
     rammID: string,
