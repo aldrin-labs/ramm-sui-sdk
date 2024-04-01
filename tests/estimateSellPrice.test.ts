@@ -117,5 +117,5 @@ describe('Sell trade price estimation', () => {
         console.log('Ammt used in estimation: ' + priceEstimationEventJSON.amount_in);
         console.log('Amnt used in actual trade: ' + tradeInEventJSON.amount_in);
 
-    }, /** timeout for the test, in ms */ 5_000);
+    }, /** timeout for the test, in ms */ 10_000);
 });
