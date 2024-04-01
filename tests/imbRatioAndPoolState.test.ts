@@ -9,8 +9,7 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-import { describe, test } from 'vitest';
-import { assert } from "console";
+import { assert, describe, test } from 'vitest';
 
 describe('Separate Pool state/imb ratio query', () => {
     test('Simultaneously query the pool state and imbalance ratios of a BTC/ETH/SOL pool', async () => {
@@ -74,8 +73,12 @@ describe('Separate Pool state/imb ratio query', () => {
             imbRatioEventJSON: imbRatioEventJSON2
         } = await ramm.getPoolStateAndImbalanceRatios(suiClient, testKeypair.toSuiAddress());
 
-        assert(poolStateEventJSON === poolStateEventJSON2);
-        assert(imbRatioEventJSON === imbRatioEventJSON2);
+        assert.equal(poolStateEventJSON.ramm_id, poolStateEventJSON2.ramm_id);
+        assert.equal(poolStateEventJSON.asset_types.length, poolStateEventJSON2.asset_types.length);
+        assert.equal(poolStateEventJSON.asset_balances.length, poolStateEventJSON2.asset_balances.length);
+        assert.equal(poolStateEventJSON.asset_lpt_issued.length, poolStateEventJSON2.asset_lpt_issued.length);
+
+        assert.equal(imbRatioEventJSON.ramm_id, imbRatioEventJSON2.ramm_id);
 
         const poolState = processPoolStateEvent(ramm, poolStateEventJSON);
         console.log('Processed pool state: ', poolState);
