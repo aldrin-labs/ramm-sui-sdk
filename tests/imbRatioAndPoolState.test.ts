@@ -1,14 +1,18 @@
-import { PoolStateEvent, RAMMSuiPool, SuiSupportedNetworks } from "../src/types";
+import { 
+    ImbalanceRatioEvent, PoolStateEvent, RAMMSuiPool, SuiSupportedNetworks,
+    processImbRatioEvent, processPoolStateEvent
+} from "../src/types";
 import { rammSuiConfigs } from "../src/constants";
-import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils";
+import { TESTNET, sleep, testKeypair } from "./utils";
 
 import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
 import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-import { describe, expect, test } from 'vitest';
+import { describe, test } from 'vitest';
+import { assert } from "console";
 
-describe('Pool state/imb ratio query', () => {
+describe('Separate Pool state/imb ratio query', () => {
     test('Simultaneously query the pool state and imbalance ratios of a BTC/ETH/SOL pool', async () => {
         /**
          * Create a Sui client, and retrieve an existing and initialized RAMM pool from
@@ -62,7 +66,21 @@ describe('Pool state/imb ratio query', () => {
         console.log('Pool state event: ', poolStateEventJSON);
 
         const imbRatioEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
-        const imbRatioEventJSON = imbRatioEvent.parsedJson as PoolStateEvent;
+        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent;
         console.log('Imbalance ratio event: ', JSON.stringify(imbRatioEventJSON, null, 4));
+
+        const {
+            poolStateEventJSON: poolStateEventJSON2,
+            imbRatioEventJSON: imbRatioEventJSON2
+        } = await ramm.getPoolStateAndImbalanceRatios(suiClient, testKeypair.toSuiAddress());
+
+        assert(poolStateEventJSON === poolStateEventJSON2);
+        assert(imbRatioEventJSON === imbRatioEventJSON2);
+
+        const poolState = processPoolStateEvent(ramm, poolStateEventJSON);
+        console.log('Processed pool state: ', poolState);
+
+        const imbRatios = processImbRatioEvent(ramm, imbRatioEventJSON);
+        console.log('Processed imbalance ratios: ', imbRatios);
     }, /** timeout for the test, in ms */ 7_500);
 });

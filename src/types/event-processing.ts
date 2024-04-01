@@ -1,10 +1,10 @@
-import { PoolStateEvent } from "./events"
+import { ImbalanceRatioEvent, PoolStateEvent } from "./events"
 import { RAMMSuiPool } from "./ramm-sui"
 
 /**
- * Structure representing a RAMM's pool state query, processed from its Sui Move event JSON.
+ * Structure representing a RAMM's pool state query, processed from its Sui Move event's JSON.
  *
- * Simplification of the data in a pool state event, as it is meant for consumption by 
+ * It is a simplified version of the data in the JSON.
  */
 export type RAMMPoolState = {
     rammID: string,
@@ -19,12 +19,14 @@ export type RAMMPoolState = {
  * @param poolStateEvent The Sui Move event of a pool state query.
  * @returns The processed pool state data.
  */
-function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: PoolStateEvent): RAMMPoolState {
+export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: PoolStateEvent): RAMMPoolState {
     let assetBalances: Record<string, number> = {}
     let assetLPTIssued: Record<string, number> = {}
 
     for (let i = 0; i < poolStateEvent.asset_types.length; i++) {
-        let assetType = poolStateEvent.asset_types[i].name
+        // Sui Move events don't use the '0x' prefix for asset types, and
+        // the RAMM data uses it. Thus, it is added here.
+        let assetType = '0x' + poolStateEvent.asset_types[i].name
         const assetIndex = rammSuiPool.assetTypeIndices.get(assetType)
         const assetTicker = rammSuiPool.assetConfigs[assetIndex!].assetTicker
 
@@ -44,11 +46,31 @@ function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: PoolSta
 }
 
 /**
- * Structure representing a RAMM's imbalance ratio data.
+ * Structure representing a RAMM's imbalance ratio data, simplified from its Sui Move event's JSON.
  *
  * Simplification of the data in an imbalance ratio event.
  */
 export type RAMMImbalanceRatioData = {
     rammID: string,
-    imb_ratios: Record<string, number>
+    imbRatios: Record<string, number>
+}
+
+export function processImbRatioEvent(rammSuiPool: RAMMSuiPool, imbalanceRatioEvent: ImbalanceRatioEvent): RAMMImbalanceRatioData {
+    let imbRatios: Record<string, number> = {}
+
+    for (let i = 0; i < imbalanceRatioEvent.imb_ratios.contents.length; i++) {
+        // Sui Move events don't use the '0x' prefix for asset types - required
+        let assetType = '0x' + imbalanceRatioEvent.imb_ratios.contents[i].key.name
+        const assetIndex = rammSuiPool.assetTypeIndices.get(assetType)
+        const assetTicker = rammSuiPool.assetConfigs[assetIndex!].assetTicker
+
+        let imbRatio = imbalanceRatioEvent.imb_ratios.contents[i].value / (10 ** rammSuiPool.precisionDecimalPlaces)
+
+        imbRatios[assetTicker] = imbRatio
+    }
+
+    return {
+        rammID: imbalanceRatioEvent.ramm_id,
+        imbRatios
+    }
 }
