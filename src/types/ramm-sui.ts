@@ -1,5 +1,7 @@
+import { SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
+import { ImbalanceRatioEvent, PoolStateEvent } from './events';
 
 export class AssetConfig {
     /**
@@ -490,5 +492,40 @@ export class RAMMSuiPool {
         });
 
         return txb
+    }
+
+    /**
+     * Perform a combined pool state/imbalance ration query to a RAMM pool.
+     *
+     * @param suiClient Sui client to use for the query, which will rely on `devInspectTransactionBlock`
+     * @param sender Address to pass on to `devInspectTransactionBlock` for the query.
+     * @returns A promise that resolves to an object containing the pool state and imbalance ratios,
+     * parsed from their respective Sui Move events.
+     */
+    async getPoolStateAndImbalanceRatios(suiClient: SuiClient, sender: string): Promise<
+        {
+            poolStateEventJSON: PoolStateEvent,
+            imbRatioEventJSON: ImbalanceRatioEvent
+        }
+    > {
+        const txb = new TransactionBlock();
+        this.getPoolState(txb);
+        this.getPoolImbalanceRatios(txb);
+
+        let resp = await suiClient.devInspectTransactionBlock({
+            sender,
+            transactionBlock: txb,
+        });
+
+        const poolStateEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'PoolStateEvent')[0];
+        const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
+
+        const imbRatioEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
+        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent;
+
+        return {
+            poolStateEventJSON,
+            imbRatioEventJSON
+        }
     }
 }
