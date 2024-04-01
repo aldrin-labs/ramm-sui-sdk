@@ -38,6 +38,9 @@ export class RAMMSuiPoolConfig {
 
     precisionDecimalPlaces?: number;
     maxPrecisionDecimalPlaces?: number;
+    lpTokensDecimalPlaces?: number;
+    factorLPT?: number;
+
     delta?: number;
     baseFee?: number;
     baseLeverage?: number;
@@ -94,6 +97,21 @@ export class RAMMSuiPool {
     maxPrecisionDecimalPlaces: number;
 
     /**
+     * The number of decimal places applied internally to every amount of LP tokens, in the RAMM's
+     * internal calculations.
+     */
+    lpTokensDecimalPlaces: number;
+
+    /**
+     * Factor to apply to LP token amounts during calculations.
+     *
+     * The following sohuld hold:
+     *
+     * `factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces)`
+     */
+    factorLPT: number;
+
+    /**
      * The pool's permitted deviation from base imbalance ratio of 1: - real number \in [0, 1[.
      */
     delta: number;
@@ -129,6 +147,7 @@ export class RAMMSuiPool {
             assetConfigs,
             precisionDecimalPlaces = 12,
             maxPrecisionDecimalPlaces = 25,
+            lpTokensDecimalPlaces = 9,
             delta = 0.25,
             baseFee = 0.001,
             baseLeverage = 100,
@@ -151,6 +170,15 @@ export class RAMMSuiPool {
 
         this.precisionDecimalPlaces = precisionDecimalPlaces;
         this.maxPrecisionDecimalPlaces = maxPrecisionDecimalPlaces;
+        this.lpTokensDecimalPlaces = lpTokensDecimalPlaces;
+
+        if (precisionDecimalPlaces < lpTokensDecimalPlaces) {
+            throw new Error("RAMMSuiPool: `precisionDecimalPlaces` must be >= `lpTokensDecimalPlaces`")
+        }
+
+        this.factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces);
+
+
         this.delta = delta;
         this.baseFee = baseFee;
         this.baseLeverage = baseLeverage;
