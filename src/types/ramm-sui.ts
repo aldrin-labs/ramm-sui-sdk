@@ -545,10 +545,16 @@ export class RAMMSuiPool {
             transactionBlock: txb,
         });
 
-        const poolStateEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'PoolStateEvent')[0];
+        const poolStateEvent = resp.events.filter((event) => event.type.split('::')[2] === 'PoolStateEvent')[0];
+        if (poolStateEvent === undefined) {
+            throw new Error('No PoolStateEvent found in the response');
+        }
         const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
 
-        const imbRatioEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
+        const imbRatioEvent = resp.events.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
+        if (imbRatioEvent === undefined) {
+            throw new Error('No ImbalanceRatioEvent found in the response');
+        }
         const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent;
 
         return {
