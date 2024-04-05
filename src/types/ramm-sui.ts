@@ -1,5 +1,7 @@
+import { SuiClient } from '@mysten/sui.js/client';
 import { TransactionBlock, TransactionObjectInput } from '@mysten/sui.js/transactions';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
+import { ImbalanceRatioEvent, PoolStateEvent } from './events';
 
 export class AssetConfig {
     /**
@@ -36,6 +38,9 @@ export class RAMMSuiPoolConfig {
 
     precisionDecimalPlaces?: number;
     maxPrecisionDecimalPlaces?: number;
+    lpTokensDecimalPlaces?: number;
+    factorLPT?: number;
+
     delta?: number;
     baseFee?: number;
     baseLeverage?: number;
@@ -92,6 +97,21 @@ export class RAMMSuiPool {
     maxPrecisionDecimalPlaces: number;
 
     /**
+     * The number of decimal places applied internally to every amount of LP tokens, in the RAMM's
+     * internal calculations.
+     */
+    lpTokensDecimalPlaces: number;
+
+    /**
+     * Factor to apply to LP token amounts during calculations.
+     *
+     * The following sohuld hold:
+     *
+     * `factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces)`
+     */
+    factorLPT: number;
+
+    /**
      * The pool's permitted deviation from base imbalance ratio of 1: - real number \in [0, 1[.
      */
     delta: number;
@@ -127,6 +147,7 @@ export class RAMMSuiPool {
             assetConfigs,
             precisionDecimalPlaces = 12,
             maxPrecisionDecimalPlaces = 25,
+            lpTokensDecimalPlaces = 9,
             delta = 0.25,
             baseFee = 0.001,
             baseLeverage = 100,
@@ -149,6 +170,15 @@ export class RAMMSuiPool {
 
         this.precisionDecimalPlaces = precisionDecimalPlaces;
         this.maxPrecisionDecimalPlaces = maxPrecisionDecimalPlaces;
+        this.lpTokensDecimalPlaces = lpTokensDecimalPlaces;
+
+        if (precisionDecimalPlaces < lpTokensDecimalPlaces) {
+            throw new Error("RAMMSuiPool: `precisionDecimalPlaces` must be >= `lpTokensDecimalPlaces`")
+        }
+
+        this.factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces);
+
+
         this.delta = delta;
         this.baseFee = baseFee;
         this.baseLeverage = baseLeverage;
@@ -468,9 +498,7 @@ export class RAMMSuiPool {
      * @returns The transaction block containing the imbalance ratio emission `moveCall`. It can then be
      * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
      */
-    getPoolImbalanceRatios(): TransactionBlock {
-        const txb = new TransactionBlock();
-
+    getPoolImbalanceRatios(txb: TransactionBlock): TransactionBlock {
         const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
@@ -492,5 +520,46 @@ export class RAMMSuiPool {
         });
 
         return txb
+    }
+
+    /**
+     * Perform a combined pool state/imbalance ration query to a RAMM pool.
+     *
+     * @param suiClient Sui client to use for the query, which will rely on `devInspectTransactionBlock`
+     * @param sender Address to pass on to `devInspectTransactionBlock` for the query.
+     * @returns A promise that resolves to an object containing the pool state and imbalance ratios,
+     * parsed from their respective Sui Move events.
+     */
+    async getPoolStateAndImbalanceRatios(suiClient: SuiClient, sender: string): Promise<
+        {
+            poolStateEventJSON: PoolStateEvent,
+            imbRatioEventJSON: ImbalanceRatioEvent
+        }
+    > {
+        const txb = new TransactionBlock();
+        this.getPoolState(txb);
+        this.getPoolImbalanceRatios(txb);
+
+        let resp = await suiClient.devInspectTransactionBlock({
+            sender,
+            transactionBlock: txb,
+        });
+
+        const poolStateEvent = resp.events.filter((event) => event.type.split('::')[2] === 'PoolStateEvent')[0];
+        if (poolStateEvent === undefined) {
+            throw new Error('No PoolStateEvent found in the response');
+        }
+        const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
+
+        const imbRatioEvent = resp.events.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
+        if (imbRatioEvent === undefined) {
+            throw new Error('No ImbalanceRatioEvent found in the response');
+        }
+        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent;
+
+        return {
+            poolStateEventJSON,
+            imbRatioEventJSON
+        }
     }
 }

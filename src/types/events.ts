@@ -80,15 +80,25 @@ export type PriceEstimationEvent = {
     protocol_fee: number,
 }
 
+/**
+ * Key/value pair of an asset's type, and its imbalance ratio scaled with that asset's decimal
+ * places.
+ */
 export type ImbRatioDict = {
     key: TypeName,
     value: number,
 }
 
+/**
+ * Wrapping object containing an array with the query's imbalance ratio data.
+ */
 export type ImbRatioContents = {
     contents: ImbRatioDict[],
 }
 
+/**
+ * Structure representing the Sui Move event, in JSON, of a RAMM's imbalance ratio query.
+ */
 export type ImbalanceRatioEvent = {
     ramm_id: string,
     requester: string,

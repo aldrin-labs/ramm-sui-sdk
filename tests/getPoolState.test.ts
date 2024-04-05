@@ -9,7 +9,7 @@ import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { describe, expect, test } from 'vitest';
 
 describe('Pool state query', () => {
-    test('Get coins from `ramm-misc` faucet, and then deposit liquidity to a BTC/ETH/SOL RAMM pool', async () => {
+    test('Query the state of a BTC/ETH/SOL RAMM pool', async () => {
         /**
          * Create a Sui client, and retrieve an existing and initialized RAMM pool from
          * the configs provided in the library.
