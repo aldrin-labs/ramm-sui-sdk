@@ -102,7 +102,7 @@ export const rammSuiConfigs: RAMMSuiPoolConfigs = {
                     minimumTradeAmount: 10_000_000,
                 },
                 {
-                    assetAggregator: '0x456efc067f5b4d7fe4a4c561f6937e14b95969d3b4cecd7ee94eedd01499f94a',
+                    assetAggregator: '0xfa4e1ec7867c4654c3f1a9980178bac51555751d9343f34dedeb60d294f7ec8a',
                     assetType: '0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN',
                     assetTicker: 'USDC',
                     assetDecimalPlaces: 6,
