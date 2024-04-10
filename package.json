@@ -9,6 +9,7 @@
     ],
     "scripts": {
         "build": "yarn rimraf ./dist/; tsc",
+        "lint": "npx eslint --ignore-path .eslintignore --ext .js,.ts",
         "prepublish": "yarn run build",
         "test": "vitest"
     },
