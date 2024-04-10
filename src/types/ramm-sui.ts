@@ -346,6 +346,7 @@ export class RAMMSuiPool {
      * Create a PTB to estimate a trade's price and fee, given a base asset, a quote asset,
      * and the quantityt of the base asset.
      *
+     * @param txb The transaction block to which the price estimation Move call will be added.
      * @param param.assetIn The Sui Move type of the asset that would be going into the pool.
      * @param param.assetOut The Sui Move type of the asset that would be coming out of the pool.
      * @param param.amountIn The amount of the hypothetical trade's base asset
@@ -353,14 +354,13 @@ export class RAMMSuiPool {
      * dry run with `devInspectTransactionBlock/dryRunTransactionBlock`, and its event inspected.
      */
     estimatePriceWithAmountIn(
+        txb: TransactionBlock,
         param: {
             assetIn: string,
             assetOut: string,
             amountIn: number,
         }
     ): TransactionBlock {
-        const txb = new TransactionBlock();
-
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
                 let str = assetConfig.assetAggregator;
