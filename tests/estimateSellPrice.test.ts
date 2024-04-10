@@ -39,7 +39,9 @@ describe('Sell trade price estimation', () => {
 
         // This is 1 ADA, to be used for the trade.
         const adaAmount: number = 100_000_000;
-        const estimate_txb = ramm.estimatePriceWithAmountIn(
+        const estimate_txb = new TransactionBlock();
+        ramm.estimatePriceWithAmountIn(
+            estimate_txb,
             {
                 assetIn: adaType,
                 assetOut: dotType,
@@ -54,7 +56,9 @@ describe('Sell trade price estimation', () => {
         const priceEstimationEventJSON = devInspectRes.events[0].parsedJson as PriceEstimationEvent;
 
         const adaAmount2: number = adaAmount * 10_000;
-        const estimate_txb2 = ramm.estimatePriceWithAmountIn(
+        const estimate_txb2 = new TransactionBlock();
+        ramm.estimatePriceWithAmountIn(
+            estimate_txb2,
             {
                 assetIn: adaType,
                 assetOut: dotType,

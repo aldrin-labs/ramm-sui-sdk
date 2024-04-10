@@ -41,7 +41,9 @@ describe('Sell trade price estimation', () => {
         const dotAmount: number = 50_000_000;
         // We'd like about 6.5 ADA for half a DOT.
         const adaAmount: number = 650_000_000;
-        const estimate_txb = ramm.estimatePriceWithAmountIn(
+        const estimate_txb = new TransactionBlock();
+         ramm.estimatePriceWithAmountIn(
+            estimate_txb,
             {
                 assetIn: dotType,
                 assetOut: adaType,
