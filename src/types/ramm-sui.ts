@@ -1,50 +1,50 @@
-import { SuiClient } from '@mysten/sui.js/client';
-import { TransactionBlock, TransactionObjectInput } from '@mysten/sui.js/transactions';
-import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
-import { ImbalanceRatioEvent, PoolStateEvent } from './events';
+import { SuiClient } from "@mysten/sui.js/client"
+import { TransactionBlock, TransactionObjectInput } from "@mysten/sui.js/transactions"
+import { SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils"
+import { ImbalanceRatioEvent, PoolStateEvent } from "./events"
 
 export class AssetConfig {
     /**
      * Address of the Switchboard `Aggregator`s for this asset.
      */
-    assetAggregator: string;
+    assetAggregator: string
     /**
      * An asset's type `<package-id>::<module-name>::<type-name>`.
      */
-    assetType: string;
+    assetType: string
     /**
      * An asset's ticker symbol (e.g. `WETH` for Wrapped Ethereum bridged in Sui).
      */
-    assetTicker: string;
+    assetTicker: string
     /**
      * An asset's decimal place count.
      */
-    assetDecimalPlaces: number;
+    assetDecimalPlaces: number
     /**
      * An asset's minimum trade amount, specified with the asset's decimal place count.
      */
-    minimumTradeAmount: number;
+    minimumTradeAmount: number
 }
 
 export class RAMMSuiPoolConfig {
-    name: string;
-    packageId: string;
-    moduleName: string;
-    poolAddress: string;
-    assetCount: number;
+    name: string
+    packageId: string
+    moduleName: string
+    poolAddress: string
+    assetCount: number
 
-    assetTypeIndices: Map<string, number>;
-    assetConfigs: AssetConfig[];
+    assetTypeIndices: Map<string, number>
+    assetConfigs: AssetConfig[]
 
-    precisionDecimalPlaces?: number;
-    maxPrecisionDecimalPlaces?: number;
-    lpTokensDecimalPlaces?: number;
-    factorLPT?: number;
+    precisionDecimalPlaces?: number
+    maxPrecisionDecimalPlaces?: number
+    lpTokensDecimalPlaces?: number
+    factorLPT?: number
 
-    delta?: number;
-    baseFee?: number;
-    baseLeverage?: number;
-    protocolFee?: number;
+    delta?: number
+    baseFee?: number
+    baseLeverage?: number
+    protocolFee?: number
 }
 
 /**
@@ -55,52 +55,52 @@ export class RAMMSuiPool {
      * Name of the RAMM pool.
      * Example: `RAMM ETH/BTC/SUI pool in Sui Mainnet`
      */
-    name: string;
+    name: string
     /**
      * ID of the package which was/is used to create, populate, initialize and interact with the
      * RAMM pool.
      */
-    packageId: string;
+    packageId: string
     /**
      * Name of the module in the above package ID which hosts the RAMM's `struct`.
      */
-    moduleName: string;
+    moduleName: string
     /**
      * Address of the RAMM pool object in the Sui network.
      */
-    poolAddress: string;
+    poolAddress: string
     /**
      * Number of assets in the pool-
      * After pool population and initialization, it cannot be changed - it becomes effectively a
      * constant.
      */
-    readonly assetCount: number;
+    readonly assetCount: number
 
-    assetTypeIndices: Map<string, number>;
+    assetTypeIndices: Map<string, number>
     /**
      * Metadata for each of the pool's assets.
      */
-    assetConfigs: AssetConfig[];
+    assetConfigs: AssetConfig[]
 
     /**
      * The number of decimal places of precision the pool uses in its internal calculations.
      *
      * Positive integer \in [9, 25], default is 12.
      */
-    precisionDecimalPlaces: number;
+    precisionDecimalPlaces: number
 
     /**
      * The maximum number of decimal places of precision the pool can use in its internal calculations.
      *
      * Positive integer \in [9, 25], default is 25. Must be equal to or greater than `precisionDecimalPlaces`.
      */
-    maxPrecisionDecimalPlaces: number;
+    maxPrecisionDecimalPlaces: number
 
     /**
      * The number of decimal places applied internally to every amount of LP tokens, in the RAMM's
      * internal calculations.
      */
-    lpTokensDecimalPlaces: number;
+    lpTokensDecimalPlaces: number
 
     /**
      * Factor to apply to LP token amounts during calculations.
@@ -109,25 +109,25 @@ export class RAMMSuiPool {
      *
      * `factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces)`
      */
-    factorLPT: number;
+    factorLPT: number
 
     /**
      * The pool's permitted deviation from base imbalance ratio of 1: - real number \in [0, 1[.
      */
-    delta: number;
+    delta: number
     /**
      * The pool's base fee - real number \in [0, 1[.
      */
-    baseFee: number;
+    baseFee: number
     /**
      * The pool's base leverage - real number \in ]0, 100].
      */
-    baseLeverage: number;
+    baseLeverage: number
     /**
      * The pool's protocol fee - real number \in [0, 1[.
      * It dictates the percentage of the base fee that goes to the pool's owners.
      */
-    protocolFee: number;
+    protocolFee: number
 
     /**
      * @constructor
@@ -159,30 +159,30 @@ export class RAMMSuiPool {
             throw new Error("RAMMSuiPool: asset count differs from number of assets provided")
         }
 
-        this.name = name;
-        this.packageId = packageId;
-        this.moduleName = moduleName;
-        this.poolAddress = poolAddress;
-        this.assetCount = assetCount;
+        this.name = name
+        this.packageId = packageId
+        this.moduleName = moduleName
+        this.poolAddress = poolAddress
+        this.assetCount = assetCount
 
-        this.assetTypeIndices = assetTypeIndices;
-        this.assetConfigs = assetConfigs;
+        this.assetTypeIndices = assetTypeIndices
+        this.assetConfigs = assetConfigs
 
-        this.precisionDecimalPlaces = precisionDecimalPlaces;
-        this.maxPrecisionDecimalPlaces = maxPrecisionDecimalPlaces;
-        this.lpTokensDecimalPlaces = lpTokensDecimalPlaces;
+        this.precisionDecimalPlaces = precisionDecimalPlaces
+        this.maxPrecisionDecimalPlaces = maxPrecisionDecimalPlaces
+        this.lpTokensDecimalPlaces = lpTokensDecimalPlaces
 
         if (precisionDecimalPlaces < lpTokensDecimalPlaces) {
             throw new Error("RAMMSuiPool: `precisionDecimalPlaces` must be >= `lpTokensDecimalPlaces`")
         }
 
-        this.factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces);
+        this.factorLPT = 10 ** (precisionDecimalPlaces - lpTokensDecimalPlaces)
 
 
-        this.delta = delta;
-        this.baseFee = baseFee;
-        this.baseLeverage = baseLeverage;
-        this.protocolFee = protocolFee;
+        this.delta = delta
+        this.baseFee = baseFee
+        this.baseLeverage = baseLeverage
+        this.protocolFee = protocolFee
     }
 
     /**
@@ -203,22 +203,22 @@ export class RAMMSuiPool {
             assetIn: string,
             amountIn: TransactionObjectInput,
     }) {
-        let assetAggregators = this.assetConfigs.map(
+        const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
-                let str = assetConfig.assetAggregator;
-                return txb.object(str);
+                const str = assetConfig.assetAggregator
+                return txb.object(str)
             }
-        );
+        )
 
-        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
-        const [assetInAggregator] = assetAggregators.splice(assetInIndex, 1);
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number
+        const [assetInAggregator] = assetAggregators.splice(assetInIndex, 1)
 
         const otherAssetTypes: string[] = this
             .assetConfigs
             .map(
                 (assetConfig) => assetConfig.assetType
-            );
-        otherAssetTypes.splice(assetInIndex, 1);
+            )
+        otherAssetTypes.splice(assetInIndex, 1)
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::liquidity_deposit_${this.assetCount}`,
@@ -231,7 +231,7 @@ export class RAMMSuiPool {
             typeArguments: [
                 param.assetIn,
             ].concat(otherAssetTypes),
-        });
+        })
     }
 
     /**
@@ -254,17 +254,17 @@ export class RAMMSuiPool {
     }) {
         const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
-                let str = assetConfig.assetAggregator;
-                return txb.object(str);
+                const str = assetConfig.assetAggregator
+                return txb.object(str)
             }
-        );
+        )
 
-        let assetTypes: string[] = this
+        const assetTypes: string[] = this
             .assetConfigs
             .map(
                 (assetConfig) => assetConfig.assetType
-            );
-        assetTypes.push(param.assetOut);
+            )
+        assetTypes.push(param.assetOut)
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::liquidity_withdrawal_${this.assetCount}`,
@@ -274,7 +274,7 @@ export class RAMMSuiPool {
                 txb.object(param.lpToken),
             ].concat(assetAggregators),
             typeArguments: assetTypes
-        });
+        })
     }
 
     /**
@@ -299,20 +299,20 @@ export class RAMMSuiPool {
     }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
-                let str = assetConfig.assetAggregator;
-                return txb.object(str);
+                const str = assetConfig.assetAggregator
+                return txb.object(str)
             }
-        );
+        )
 
-        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
-        const assetInAggregator = assetAggregators[assetInIndex];
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number
+        const assetInAggregator = assetAggregators[assetInIndex]
 
-        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
-        const assetOutAggregator = assetAggregators[assetOutIndex];
+        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number
+        const assetOutAggregator = assetAggregators[assetOutIndex]
 
         assetAggregators = assetAggregators.filter(
             (_, index) => index !== assetInIndex && index !== assetOutIndex
-        );
+        )
 
         // notice that assetAggregators is now missing the assetIn and assetOut aggregators.
 
@@ -323,7 +323,7 @@ export class RAMMSuiPool {
             )
             .filter(
                 (assetType) => assetType !== param.assetIn && assetType !== param.assetOut
-            );
+            )
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::trade_amount_in_${this.assetCount}`,
@@ -339,7 +339,7 @@ export class RAMMSuiPool {
                 param.assetIn,
                 param.assetOut,
             ].concat(otherAssetTypes),
-        });
+        })
     }
 
     /**
@@ -363,20 +363,20 @@ export class RAMMSuiPool {
     ): TransactionBlock {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
-                let str = assetConfig.assetAggregator;
-                return txb.object(str);
+                const str = assetConfig.assetAggregator
+                return txb.object(str)
             }
-        );
+        )
 
-        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
-        const assetInAggregator = assetAggregators[assetInIndex];
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number
+        const assetInAggregator = assetAggregators[assetInIndex]
 
-        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
-        const assetOutAggregator = assetAggregators[assetOutIndex];
+        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number
+        const assetOutAggregator = assetAggregators[assetOutIndex]
 
         assetAggregators = assetAggregators.filter(
             (_, index) => index !== assetInIndex && index !== assetOutIndex
-        );
+        )
 
         // notice that assetAggregators is now missing the assetIn and assetOut aggregators.
 
@@ -387,7 +387,7 @@ export class RAMMSuiPool {
             )
             .filter(
                 (assetType) => assetType !== param.assetIn && assetType !== param.assetOut
-            );
+            )
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::trade_price_estimate_${this.assetCount}`,
@@ -402,7 +402,7 @@ export class RAMMSuiPool {
                 param.assetIn,
                 param.assetOut,
             ].concat(otherAssetTypes),
-        });
+        })
 
         return txb
     }
@@ -428,20 +428,20 @@ export class RAMMSuiPool {
     }) {
         let assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
-                let str = assetConfig.assetAggregator;
-                return txb.object(str);
+                const str = assetConfig.assetAggregator
+                return txb.object(str)
             }
-        );
+        )
 
-        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number;
-        const assetInAggregator = assetAggregators[assetInIndex];
+        const assetInIndex: number  = this.assetTypeIndices.get(param.assetIn) as number
+        const assetInAggregator = assetAggregators[assetInIndex]
 
-        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number;
-        const assetOutAggregator = assetAggregators[assetOutIndex];
+        const assetOutIndex: number  = this.assetTypeIndices.get(param.assetOut) as number
+        const assetOutAggregator = assetAggregators[assetOutIndex]
 
         assetAggregators = assetAggregators.filter(
             (_, index) => index !== assetInIndex && index !== assetOutIndex
-        );
+        )
 
         // recall that assetAggregators is now missing the assetIn and assetOut aggregators.
 
@@ -452,7 +452,7 @@ export class RAMMSuiPool {
             )
             .filter(
                 (assetType) => assetType !== param.assetIn && assetType !== param.assetOut
-            );
+            )
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::trade_amount_out_${this.assetCount}`,
@@ -468,7 +468,7 @@ export class RAMMSuiPool {
                 param.assetIn,
                 param.assetOut,
             ].concat(otherAssetTypes),
-        });
+        })
     }
 
     /**
@@ -484,7 +484,7 @@ export class RAMMSuiPool {
         txb.moveCall({
             target: `${this.packageId}::${this.moduleName}::get_pool_state`,
             arguments: [txb.object(this.poolAddress)],
-        });
+        })
     }
 
     /**
@@ -501,14 +501,14 @@ export class RAMMSuiPool {
     getPoolImbalanceRatios(txb: TransactionBlock): TransactionBlock {
         const assetAggregators = this.assetConfigs.map(
             (assetConfig) => {
-                let str = assetConfig.assetAggregator;
-                return txb.object(str);
+                const str = assetConfig.assetAggregator
+                return txb.object(str)
             }
-        );
+        )
 
         const assetTypes: string[] = this
             .assetConfigs
-            .map((assetConfig) => assetConfig.assetType);
+            .map((assetConfig) => assetConfig.assetType)
 
         txb.moveCall({
             target: `${this.packageId}::interface${this.assetCount}::imbalance_ratios_event_${this.assetCount}`,
@@ -517,7 +517,7 @@ export class RAMMSuiPool {
                 txb.object(SUI_CLOCK_OBJECT_ID),
             ].concat(assetAggregators),
             typeArguments: assetTypes,
-        });
+        })
 
         return txb
     }
@@ -536,26 +536,26 @@ export class RAMMSuiPool {
             imbRatioEventJSON: ImbalanceRatioEvent
         }
     > {
-        const txb = new TransactionBlock();
-        this.getPoolState(txb);
-        this.getPoolImbalanceRatios(txb);
+        const txb = new TransactionBlock()
+        this.getPoolState(txb)
+        this.getPoolImbalanceRatios(txb)
 
-        let resp = await suiClient.devInspectTransactionBlock({
+        const resp = await suiClient.devInspectTransactionBlock({
             sender,
             transactionBlock: txb,
-        });
+        })
 
-        const poolStateEvent = resp.events.filter((event) => event.type.split('::')[2] === 'PoolStateEvent')[0];
+        const poolStateEvent = resp.events.filter((event) => event.type.split("::")[2] === "PoolStateEvent")[0]
         if (poolStateEvent === undefined) {
-            throw new Error('No PoolStateEvent found in the response');
+            throw new Error("No PoolStateEvent found in the response")
         }
-        const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
+        const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent
 
-        const imbRatioEvent = resp.events.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
+        const imbRatioEvent = resp.events.filter((event) => event.type.split("::")[2] === "ImbalanceRatioEvent")[0]
         if (imbRatioEvent === undefined) {
-            throw new Error('No ImbalanceRatioEvent found in the response');
+            throw new Error("No ImbalanceRatioEvent found in the response")
         }
-        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent;
+        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent
 
         return {
             poolStateEventJSON,

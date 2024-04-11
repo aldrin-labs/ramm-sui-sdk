@@ -23,19 +23,19 @@ export type RAMMPoolState = {
  * @returns The processed pool state data.
  */
 export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: PoolStateEvent): RAMMPoolState {
-    let assetBalances: Record<string, number> = {}
-    let assetLPTIssued: Record<string, number> = {}
+    const assetBalances: Record<string, number> = {}
+    const assetLPTIssued: Record<string, number> = {}
 
     for (let i = 0; i < poolStateEvent.asset_types.length; i++) {
         // Sui Move events don't use the '0x' prefix for asset types, and
         // the RAMM data uses it. Thus, it is added here.
-        let assetType = '0x' + poolStateEvent.asset_types[i].name
+        const assetType = "0x" + poolStateEvent.asset_types[i].name
         const assetIndex = rammSuiPool.assetTypeIndices.get(assetType)
         const assetTicker = rammSuiPool.assetConfigs[assetIndex!].assetTicker
 
         const assetDecimalPlaces = rammSuiPool.assetConfigs[assetIndex!].assetDecimalPlaces
-        let assetBalance = poolStateEvent.asset_balances[i] / (10 ** assetDecimalPlaces)
-        let assetLPT = poolStateEvent.asset_lpt_issued[i] / (10 ** assetDecimalPlaces)
+        const assetBalance = poolStateEvent.asset_balances[i] / (10 ** assetDecimalPlaces)
+        const assetLPT = poolStateEvent.asset_lpt_issued[i] / (10 ** assetDecimalPlaces)
 
         assetBalances[assetTicker] = assetBalance
         assetLPTIssued[assetTicker] = assetLPT
@@ -60,15 +60,15 @@ export type RAMMImbalanceRatioData = {
 }
 
 export function processImbRatioEvent(rammSuiPool: RAMMSuiPool, imbalanceRatioEvent: ImbalanceRatioEvent): RAMMImbalanceRatioData {
-    let imbRatios: Record<string, number> = {}
+    const imbRatios: Record<string, number> = {}
 
     for (let i = 0; i < imbalanceRatioEvent.imb_ratios.contents.length; i++) {
         // Sui Move events don't use the '0x' prefix for asset types - required
-        let assetType = '0x' + imbalanceRatioEvent.imb_ratios.contents[i].key.name
+        const assetType = "0x" + imbalanceRatioEvent.imb_ratios.contents[i].key.name
         const assetIndex = rammSuiPool.assetTypeIndices.get(assetType)
         const assetTicker = rammSuiPool.assetConfigs[assetIndex!].assetTicker
 
-        let imbRatio = imbalanceRatioEvent.imb_ratios.contents[i].value / (10 ** rammSuiPool.precisionDecimalPlaces)
+        const imbRatio = imbalanceRatioEvent.imb_ratios.contents[i].value / (10 ** rammSuiPool.precisionDecimalPlaces)
 
         imbRatios[assetTicker] = imbRatio
     }

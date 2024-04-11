@@ -1,4 +1,4 @@
-import { RAMMSuiPoolConfig } from "./ramm-sui";
+import { RAMMSuiPoolConfig } from "./ramm-sui"
 
 /**
  * Enum with possible Sui network environments.
@@ -8,7 +8,7 @@ import { RAMMSuiPoolConfig } from "./ramm-sui";
 export enum SuiSupportedNetworks {
     testnet,
     mainnet
-};
+}
 
 /**
  * This is a map of RAMM Sui pool configurations, keyed by their Sui environment.

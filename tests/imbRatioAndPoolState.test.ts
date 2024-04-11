@@ -1,38 +1,38 @@
 import { 
     ImbalanceRatioEvent, PoolStateEvent, RAMMSuiPool, SuiSupportedNetworks,
     processImbRatioEvent, processPoolStateEvent
-} from "../src/types";
-import { rammSuiConfigs } from "../src/constants";
-import { TESTNET, sleep, testKeypair } from "./utils";
+} from "../src/types"
+import { rammSuiConfigs } from "../src/constants"
+import { TESTNET, sleep, testKeypair } from "./utils"
 
-import { getFullnodeUrl, SuiClient } from '@mysten/sui.js/client';
-import { getFaucetHost, requestSuiFromFaucetV1 } from '@mysten/sui.js/faucet';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client"
+import { getFaucetHost, requestSuiFromFaucetV1 } from "@mysten/sui.js/faucet"
+import { TransactionBlock } from "@mysten/sui.js/transactions"
 
-import { assert, describe, test } from 'vitest';
+import { assert, describe, test } from "vitest"
 
-describe('Separate Pool state/imb ratio query', () => {
-    test('Simultaneously query the pool state and imbalance ratios of a BTC/ETH/SOL pool', async () => {
+describe("Separate Pool state/imb ratio query", () => {
+    test("Simultaneously query the pool state and imbalance ratios of a BTC/ETH/SOL pool", async () => {
         /**
          * Create a Sui client, and retrieve an existing and initialized RAMM pool from
          * the configs provided in the library.
          */
 
         // use `getFullnodeUrl` to query the testnet's RPC location
-        const rpcUrl = getFullnodeUrl(TESTNET);
+        const rpcUrl = getFullnodeUrl(TESTNET)
         // create a client connected to the testnet
-        const suiClient = new SuiClient({ url: rpcUrl });
+        const suiClient = new SuiClient({ url: rpcUrl })
 
-        const suiTestnetPools = rammSuiConfigs[SuiSupportedNetworks.testnet];
+        const suiTestnetPools = rammSuiConfigs[SuiSupportedNetworks.testnet]
         if (!suiTestnetPools) {
-            throw new Error('Sui Testnet config not found!');
+            throw new Error("Sui Testnet config not found!")
         }
 
         // Select the BTC/ETH/SOL RAMM
-        const poolConfig = suiTestnetPools[1];
-        const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig);
+        const poolConfig = suiTestnetPools[1]
+        const ramm: RAMMSuiPool = new RAMMSuiPool(poolConfig)
 
-        console.log('Running test for: ' + ramm.name);
+        console.log("Running test for: " + ramm.name)
 
         /**
          * Request SUI from the testnet's faucet.
@@ -41,16 +41,16 @@ describe('Separate Pool state/imb ratio query', () => {
         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
             recipient: testKeypair.toSuiAddress(),
-        });
+        })
 
         // Wait for the network to register the SUI faucet transaction.
-        await sleep(600);
+        await sleep(600)
 
-        const txb = new TransactionBlock();
-        ramm.getPoolState(txb);
-        ramm.getPoolImbalanceRatios(txb);
+        const txb = new TransactionBlock()
+        ramm.getPoolState(txb)
+        ramm.getPoolImbalanceRatios(txb)
 
-        let resp = await suiClient.signAndExecuteTransactionBlock({
+        const resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
             transactionBlock: txb,
             options: {
@@ -58,34 +58,34 @@ describe('Separate Pool state/imb ratio query', () => {
                 // query
                 showEvents: true
             }
-        });
+        })
 
-        const poolStateEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'PoolStateEvent')[0];
-        const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent;
-        console.log('Pool state event: ', poolStateEventJSON);
+        const poolStateEvent = resp.events!.filter((event) => event.type.split("::")[2] === "PoolStateEvent")[0]
+        const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent
+        console.log("Pool state event: ", poolStateEventJSON)
 
-        const imbRatioEvent = resp.events!.filter((event) => event.type.split('::')[2] === 'ImbalanceRatioEvent')[0];
-        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent;
-        console.log('Imbalance ratio event: ', JSON.stringify(imbRatioEventJSON, null, 4));
+        const imbRatioEvent = resp.events!.filter((event) => event.type.split("::")[2] === "ImbalanceRatioEvent")[0]
+        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent
+        console.log("Imbalance ratio event: ", JSON.stringify(imbRatioEventJSON, null, 4))
 
         const {
             poolStateEventJSON: poolStateEventJSON2,
             imbRatioEventJSON: imbRatioEventJSON2
-        } = await ramm.getPoolStateAndImbalanceRatios(suiClient, testKeypair.toSuiAddress());
+        } = await ramm.getPoolStateAndImbalanceRatios(suiClient, testKeypair.toSuiAddress())
 
-        assert.equal(poolStateEventJSON.ramm_id, poolStateEventJSON2.ramm_id);
-        assert.equal(poolStateEventJSON.asset_types.length, poolStateEventJSON2.asset_types.length);
-        assert.equal(poolStateEventJSON.asset_balances.length, poolStateEventJSON2.asset_balances.length);
-        assert.equal(poolStateEventJSON.asset_lpt_issued.length, poolStateEventJSON2.asset_lpt_issued.length);
+        assert.equal(poolStateEventJSON.ramm_id, poolStateEventJSON2.ramm_id)
+        assert.equal(poolStateEventJSON.asset_types.length, poolStateEventJSON2.asset_types.length)
+        assert.equal(poolStateEventJSON.asset_balances.length, poolStateEventJSON2.asset_balances.length)
+        assert.equal(poolStateEventJSON.asset_lpt_issued.length, poolStateEventJSON2.asset_lpt_issued.length)
 
-        assert.equal(imbRatioEventJSON.ramm_id, imbRatioEventJSON2.ramm_id);
-        assert.equal(imbRatioEventJSON.requester, imbRatioEventJSON2.requester);
-        assert.equal(imbRatioEventJSON.imb_ratios.contents.length, imbRatioEventJSON2.imb_ratios.contents.length);
+        assert.equal(imbRatioEventJSON.ramm_id, imbRatioEventJSON2.ramm_id)
+        assert.equal(imbRatioEventJSON.requester, imbRatioEventJSON2.requester)
+        assert.equal(imbRatioEventJSON.imb_ratios.contents.length, imbRatioEventJSON2.imb_ratios.contents.length)
 
-        const poolState = processPoolStateEvent(ramm, poolStateEventJSON);
-        console.log('Processed pool state: ', poolState);
+        const poolState = processPoolStateEvent(ramm, poolStateEventJSON)
+        console.log("Processed pool state: ", poolState)
 
-        const imbRatios = processImbRatioEvent(ramm, imbRatioEventJSON);
-        console.log('Processed imbalance ratios: ', imbRatios);
-    }, /** timeout for the test, in ms */ 7_500);
-});
+        const imbRatios = processImbRatioEvent(ramm, imbRatioEventJSON)
+        console.log("Processed imbalance ratios: ", imbRatios)
+    }, /** timeout for the test, in ms */ 7_500)
+})
