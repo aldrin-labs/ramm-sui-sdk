@@ -21,6 +21,12 @@ jobs:
               run: |
                   cd ${{ github.workspace }}
                   yarn install
+            - name: Lint check `ramm-sui-sdk`
+              run: |
+                  yarn lint
+            - name: Format check `ramm-sui-sdk`
+              run: |
+                  yarn format
             - name: Build `ramm-sui-sdk`
               run: |
                   yarn build
