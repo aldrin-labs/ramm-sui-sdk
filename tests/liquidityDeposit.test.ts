@@ -1,4 +1,8 @@
-import { LiquidityDepositEvent, RAMMSuiPool, SuiSupportedNetworks } from "../src/types"
+import {
+    LiquidityDepositEvent,
+    RAMMSuiPool,
+    SuiSupportedNetworks,
+} from "../src/types"
 import { rammSuiConfigs } from "../src/constants"
 
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils"
@@ -34,7 +38,7 @@ describe("Liquidity deposit", () => {
 
         /**
          * Request SUI from the testnet's faucet.
-        */
+         */
 
         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
@@ -46,7 +50,7 @@ describe("Liquidity deposit", () => {
 
         /**
          * Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
-        */
+         */
 
         const txb = new TransactionBlock()
         const btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`
@@ -55,22 +59,22 @@ describe("Liquidity deposit", () => {
         const btcAmount: number = 1_000_000
         const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
-            typeArguments: [btcType]
+            arguments: [
+                txb.object(rammMiscFaucet.faucetAddress),
+                txb.pure(btcAmount),
+            ],
+            typeArguments: [btcType],
         })
 
-        ramm.liquidityDeposit(
-            txb,
-            { assetIn: btcType, amountIn: coin }
-        )
+        ramm.liquidityDeposit(txb, { assetIn: btcType, amountIn: coin })
 
         const resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
             transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a trade
-                showEvents: true
-            }
+                showEvents: true,
+            },
         })
 
         const liqDepEvent = resp.events![0]

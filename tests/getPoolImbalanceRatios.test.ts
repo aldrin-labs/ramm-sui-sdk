@@ -1,4 +1,8 @@
-import { ImbalanceRatioEvent, RAMMSuiPool, SuiSupportedNetworks } from "../src/types"
+import {
+    ImbalanceRatioEvent,
+    RAMMSuiPool,
+    SuiSupportedNetworks,
+} from "../src/types"
 import { rammSuiConfigs } from "../src/constants"
 import { TESTNET, testKeypair } from "./utils"
 
@@ -41,20 +45,29 @@ describe("Imbalance ratio query", () => {
             transactionBlock: txb,
         })
 
-        const imbalanceRatioEventJSON = devInspectRes.events[0].parsedJson as ImbalanceRatioEvent
+        const imbalanceRatioEventJSON = devInspectRes.events[0]
+            .parsedJson as ImbalanceRatioEvent
 
-        console.log("Imbalance ratio event: " + JSON.stringify(imbalanceRatioEventJSON, null, 4))
+        console.log(
+            "Imbalance ratio event: " +
+                JSON.stringify(imbalanceRatioEventJSON, null, 4)
+        )
 
         assert.equal(imbalanceRatioEventJSON.ramm_id, ramm.poolAddress)
-        assert.equal(imbalanceRatioEventJSON.requester, testKeypair.toSuiAddress())
+        assert.equal(
+            imbalanceRatioEventJSON.requester,
+            testKeypair.toSuiAddress()
+        )
 
         let i = 0
         while (i < imbalanceRatioEventJSON.imb_ratios.contents.length) {
-            let value = Number(imbalanceRatioEventJSON.imb_ratios.contents[i].value)
+            let value = Number(
+                imbalanceRatioEventJSON.imb_ratios.contents[i].value
+            )
             value = Number(value)
             // imbalance ratios come with the RAMM's precision of decimal places, so scaling them back
             // to a real between 0 and 2 is required.
-            value /= (10 ** ramm.precisionDecimalPlaces)
+            value /= 10 ** ramm.precisionDecimalPlaces
             expect(value).toBeGreaterThan(1 - ramm.delta)
             expect(value).toBeLessThan(1 + ramm.delta)
             i++

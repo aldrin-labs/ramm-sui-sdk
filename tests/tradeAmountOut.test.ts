@@ -33,7 +33,7 @@ describe("Trade amount out of RAMM", () => {
 
         /**
          * Request SUI from the testnet's faucet.
-        */
+         */
 
         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
@@ -57,37 +57,46 @@ describe("Trade amount out of RAMM", () => {
         const btcLiqAmount: number = 100_000_000
         const btcCoin = btcEthSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [btcEthSolTxb.object(rammMiscFaucet.faucetAddress), btcEthSolTxb.pure(btcLiqAmount)],
-            typeArguments: [btcType]
+            arguments: [
+                btcEthSolTxb.object(rammMiscFaucet.faucetAddress),
+                btcEthSolTxb.pure(btcLiqAmount),
+            ],
+            typeArguments: [btcType],
         })
         // This is 22 ETH
         const ethLiqAmount: number = 2_200_000_000
         const ethCoin = btcEthSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [btcEthSolTxb.object(rammMiscFaucet.faucetAddress), btcEthSolTxb.pure(ethLiqAmount)],
-            typeArguments: [ethType]
+            arguments: [
+                btcEthSolTxb.object(rammMiscFaucet.faucetAddress),
+                btcEthSolTxb.pure(ethLiqAmount),
+            ],
+            typeArguments: [ethType],
         })
         // This is 500 SOL
         const solLiqAmount: number = 50_000_000_000
         const solCoin = btcEthSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [btcEthSolTxb.object(rammMiscFaucet.faucetAddress), btcEthSolTxb.pure(solLiqAmount)],
-            typeArguments: [solType]
+            arguments: [
+                btcEthSolTxb.object(rammMiscFaucet.faucetAddress),
+                btcEthSolTxb.pure(solLiqAmount),
+            ],
+            typeArguments: [solType],
         })
 
         // Deposit BTC and ETH liquidity, required for the test
-        ramm.liquidityDeposit(
-            btcEthSolTxb,
-            { assetIn: btcType, amountIn: btcCoin }
-        )
-        ramm.liquidityDeposit(
-            btcEthSolTxb,
-            { assetIn: ethType, amountIn: ethCoin }
-        )
-        ramm.liquidityDeposit(
-            btcEthSolTxb,
-            { assetIn: solType, amountIn: solCoin }
-        )
+        ramm.liquidityDeposit(btcEthSolTxb, {
+            assetIn: btcType,
+            amountIn: btcCoin,
+        })
+        ramm.liquidityDeposit(btcEthSolTxb, {
+            assetIn: ethType,
+            amountIn: ethCoin,
+        })
+        ramm.liquidityDeposit(btcEthSolTxb, {
+            assetIn: solType,
+            amountIn: solCoin,
+        })
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
@@ -104,29 +113,29 @@ describe("Trade amount out of RAMM", () => {
         const btcAmount: number = 10_000_000
         const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
-            typeArguments: [btcType]
+            arguments: [
+                txb.object(rammMiscFaucet.faucetAddress),
+                txb.pure(btcAmount),
+            ],
+            typeArguments: [btcType],
         })
 
-        ramm.tradeAmountOut(
-            txb,
-            {
-                assetIn: btcType,
-                assetOut: ethType,
-                // we'd like exactly 1 ETH
-                amountOut: 100_000_000,
-                // and recall that this is 0.1 BTC
-                maxAmountIn: coin,
-            }
-        )
+        ramm.tradeAmountOut(txb, {
+            assetIn: btcType,
+            assetOut: ethType,
+            // we'd like exactly 1 ETH
+            amountOut: 100_000_000,
+            // and recall that this is 0.1 BTC
+            maxAmountIn: coin,
+        })
 
         resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
             transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a trade
-                showEvents: true
-            }
+                showEvents: true,
+            },
         })
 
         const tradeOutEvent = resp.events![0]
@@ -140,9 +149,10 @@ describe("Trade amount out of RAMM", () => {
         assert.equal("0x" + tradeOutEventJSON.token_out.name, ethType)
         assert.equal(Number(tradeOutEventJSON.amount_out), 100_000_000)
         expect(Number(tradeOutEventJSON.amount_in)).toBeGreaterThan(0)
-        expect(Number(tradeOutEventJSON.amount_in)).toBeLessThanOrEqual(btcAmount)
+        expect(Number(tradeOutEventJSON.amount_in)).toBeLessThanOrEqual(
+            btcAmount
+        )
 
         expect(Number(tradeOutEventJSON.protocol_fee)).toBeGreaterThan(0)
-
     }, /** timeout for the test, in ms */ 15_000)
 })

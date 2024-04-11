@@ -44,35 +44,44 @@ describe("Trade amount into RAMM", () => {
         const adaLiqAmount: number = 20_000_000_000
         const adaCoin = adaDotSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [adaDotSolTxb.object(rammMiscFaucet.faucetAddress), adaDotSolTxb.pure(adaLiqAmount)],
-            typeArguments: [adaType]
+            arguments: [
+                adaDotSolTxb.object(rammMiscFaucet.faucetAddress),
+                adaDotSolTxb.pure(adaLiqAmount),
+            ],
+            typeArguments: [adaType],
         })
         // This is 10 DOT
         const dotLiqAmount: number = 1_000_000_000
         const dotCoin = adaDotSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [adaDotSolTxb.object(rammMiscFaucet.faucetAddress), adaDotSolTxb.pure(dotLiqAmount)],
-            typeArguments: [dotType]
+            arguments: [
+                adaDotSolTxb.object(rammMiscFaucet.faucetAddress),
+                adaDotSolTxb.pure(dotLiqAmount),
+            ],
+            typeArguments: [dotType],
         })
         // This is 1 SOL
         const solLiqAmount: number = 100_000_000
         const solCoin = adaDotSolTxb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [adaDotSolTxb.object(rammMiscFaucet.faucetAddress), adaDotSolTxb.pure(solLiqAmount)],
-            typeArguments: [solType]
+            arguments: [
+                adaDotSolTxb.object(rammMiscFaucet.faucetAddress),
+                adaDotSolTxb.pure(solLiqAmount),
+            ],
+            typeArguments: [solType],
         })
-        ramm.liquidityDeposit(
-            adaDotSolTxb,
-            { assetIn: adaType, amountIn: adaCoin }
-        )
-        ramm.liquidityDeposit(
-            adaDotSolTxb,
-            { assetIn: dotType, amountIn: dotCoin }
-        )
-        ramm.liquidityDeposit(
-            adaDotSolTxb,
-            { assetIn: solType, amountIn: solCoin }
-        )
+        ramm.liquidityDeposit(adaDotSolTxb, {
+            assetIn: adaType,
+            amountIn: adaCoin,
+        })
+        ramm.liquidityDeposit(adaDotSolTxb, {
+            assetIn: dotType,
+            amountIn: dotCoin,
+        })
+        ramm.liquidityDeposit(adaDotSolTxb, {
+            assetIn: solType,
+            amountIn: solCoin,
+        })
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
@@ -89,28 +98,28 @@ describe("Trade amount into RAMM", () => {
         const dotAmount: number = 100_000_000
         const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(dotAmount)],
-            typeArguments: [dotType]
+            arguments: [
+                txb.object(rammMiscFaucet.faucetAddress),
+                txb.pure(dotAmount),
+            ],
+            typeArguments: [dotType],
         })
 
-        ramm.tradeAmountIn(
-            txb,
-            {
-                assetIn: dotType,
-                assetOut: adaType,
-                amountIn: coin,
-                // we'd like at least 5 ADA for the 1 DOT
-                minAmountOut: 50_000_000,
-            }
-        )
+        ramm.tradeAmountIn(txb, {
+            assetIn: dotType,
+            assetOut: adaType,
+            amountIn: coin,
+            // we'd like at least 5 ADA for the 1 DOT
+            minAmountOut: 50_000_000,
+        })
 
         resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
             transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a trade
-                showEvents: true
-            }
+                showEvents: true,
+            },
         })
 
         const tradeInEvent = resp.events![0]
@@ -125,6 +134,5 @@ describe("Trade amount into RAMM", () => {
         assert.equal(Number(tradeInEventJSON.amount_in), dotAmount)
         expect(Number(tradeInEventJSON.amount_out)).toBeGreaterThan(0)
         expect(Number(tradeInEventJSON.protocol_fee)).toBeGreaterThan(0)
-
     }, /** timeout for the test, in ms */ 10_000)
 })

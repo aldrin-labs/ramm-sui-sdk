@@ -1,4 +1,8 @@
-import { LiquidityWithdrawalEvent, RAMMSuiPool, SuiSupportedNetworks} from "../src/types"
+import {
+    LiquidityWithdrawalEvent,
+    RAMMSuiPool,
+    SuiSupportedNetworks,
+} from "../src/types"
 import { rammSuiConfigs } from "../src/constants"
 import { TESTNET, rammMiscFaucet, sleep, testKeypair } from "./utils"
 
@@ -34,7 +38,7 @@ describe("Liquidity withdrawal", () => {
 
         /**
          * Request SUI from the testnet's faucet.
-        */
+         */
 
         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
@@ -46,7 +50,7 @@ describe("Liquidity withdrawal", () => {
 
         /**
          * Mint test coins from the `ramm-misc` package's `test_coin_faucet` module.
-        */
+         */
 
         let txb = new TransactionBlock()
         const btcType: string = `${rammMiscFaucet.packageId}::${rammMiscFaucet.testCoinsModule}::BTC`
@@ -55,14 +59,14 @@ describe("Liquidity withdrawal", () => {
         const btcAmount: number = 1_000_000
         const coin = txb.moveCall({
             target: `${rammMiscFaucet.packageId}::${rammMiscFaucet.faucetModule}::mint_test_coins_ptb`,
-            arguments: [txb.object(rammMiscFaucet.faucetAddress), txb.pure(btcAmount)],
-            typeArguments: [btcType]
+            arguments: [
+                txb.object(rammMiscFaucet.faucetAddress),
+                txb.pure(btcAmount),
+            ],
+            typeArguments: [btcType],
         })
 
-        ramm.liquidityDeposit(
-            txb,
-            { assetIn: btcType, amountIn: coin }
-        )
+        ramm.liquidityDeposit(txb, { assetIn: btcType, amountIn: coin })
 
         let resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
@@ -70,8 +74,8 @@ describe("Liquidity withdrawal", () => {
             options: {
                 // required, so the object ID of the LP tokens can be fetched without
                 // having to perform another RPC call.
-                showEffects: true
-            }
+                showEffects: true,
+            },
         })
 
         /**
@@ -82,27 +86,25 @@ describe("Liquidity withdrawal", () => {
         const lpBtc = Inputs.ObjectRef({
             digest: lpBtcObj.reference.digest,
             objectId: lpBtcObj.reference.objectId,
-            version: lpBtcObj.reference.version
+            version: lpBtcObj.reference.version,
         })
 
         txb = new TransactionBlock()
 
-        ramm.liquidityWithdrawal(
-            txb,
-            { assetOut: btcType,  lpToken: lpBtc }
-        )
+        ramm.liquidityWithdrawal(txb, { assetOut: btcType, lpToken: lpBtc })
 
         resp = await suiClient.signAndExecuteTransactionBlock({
             signer: testKeypair,
             transactionBlock: txb,
             options: {
                 // required, so that we can scrutinize the response's events for a liq. wthdrwl.
-                showEvents: true
-            }
+                showEvents: true,
+            },
         })
 
         const liqWithEvent = resp.events![0]
-        const liqWithEventJSON = liqWithEvent.parsedJson as LiquidityWithdrawalEvent
+        const liqWithEventJSON =
+            liqWithEvent.parsedJson as LiquidityWithdrawalEvent
 
         console.log(JSON.stringify(liqWithEventJSON, null, 4))
 
@@ -115,15 +117,17 @@ describe("Liquidity withdrawal", () => {
 
         liqWithEventJSON.amounts_out.contents.forEach((assetData) => {
             switch (assetData.key.name) {
-            case btcType: {
-                expect(Number(assetData.value)).toBeGreaterThan(0)
-                expect(Number(assetData.value)).toBeLessThanOrEqual(btcAmount)
-                break
-            }
-            default: {
-                assert.equal(Number(assetData.value), 0)
-                break
-            }
+                case btcType: {
+                    expect(Number(assetData.value)).toBeGreaterThan(0)
+                    expect(Number(assetData.value)).toBeLessThanOrEqual(
+                        btcAmount
+                    )
+                    break
+                }
+                default: {
+                    assert.equal(Number(assetData.value), 0)
+                    break
+                }
             }
         })
     }, /** timeout for the test, in ms */ 10_000)

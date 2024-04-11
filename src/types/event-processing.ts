@@ -10,8 +10,8 @@ import { RAMMSuiPool } from "./ramm-sui"
  * e.g. 1 BTC will be represented as `1`, and not `1 * 10 ** BTC.decimalPlaces`.
  */
 export type RAMMPoolState = {
-    rammID: string,
-    assetBalances: Record<string, number>,
+    rammID: string
+    assetBalances: Record<string, number>
     assetLPTIssued: Record<string, number>
 }
 
@@ -22,7 +22,10 @@ export type RAMMPoolState = {
  * @param poolStateEvent The Sui Move event of a pool state query.
  * @returns The processed pool state data.
  */
-export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: PoolStateEvent): RAMMPoolState {
+export function processPoolStateEvent(
+    rammSuiPool: RAMMSuiPool,
+    poolStateEvent: PoolStateEvent
+): RAMMPoolState {
     const assetBalances: Record<string, number> = {}
     const assetLPTIssued: Record<string, number> = {}
 
@@ -33,9 +36,12 @@ export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: 
         const assetIndex = rammSuiPool.assetTypeIndices.get(assetType)
         const assetTicker = rammSuiPool.assetConfigs[assetIndex!].assetTicker
 
-        const assetDecimalPlaces = rammSuiPool.assetConfigs[assetIndex!].assetDecimalPlaces
-        const assetBalance = poolStateEvent.asset_balances[i] / (10 ** assetDecimalPlaces)
-        const assetLPT = poolStateEvent.asset_lpt_issued[i] / (10 ** assetDecimalPlaces)
+        const assetDecimalPlaces =
+            rammSuiPool.assetConfigs[assetIndex!].assetDecimalPlaces
+        const assetBalance =
+            poolStateEvent.asset_balances[i] / 10 ** assetDecimalPlaces
+        const assetLPT =
+            poolStateEvent.asset_lpt_issued[i] / 10 ** assetDecimalPlaces
 
         assetBalances[assetTicker] = assetBalance
         assetLPTIssued[assetTicker] = assetLPT
@@ -44,7 +50,7 @@ export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: 
     return {
         rammID: poolStateEvent.ramm_id,
         assetBalances,
-        assetLPTIssued
+        assetLPTIssued,
     }
 }
 
@@ -55,26 +61,32 @@ export function processPoolStateEvent(rammSuiPool: RAMMSuiPool, poolStateEvent: 
  * by their tickers.
  */
 export type RAMMImbalanceRatioData = {
-    rammID: string,
+    rammID: string
     imbRatios: Record<string, number>
 }
 
-export function processImbRatioEvent(rammSuiPool: RAMMSuiPool, imbalanceRatioEvent: ImbalanceRatioEvent): RAMMImbalanceRatioData {
+export function processImbRatioEvent(
+    rammSuiPool: RAMMSuiPool,
+    imbalanceRatioEvent: ImbalanceRatioEvent
+): RAMMImbalanceRatioData {
     const imbRatios: Record<string, number> = {}
 
     for (let i = 0; i < imbalanceRatioEvent.imb_ratios.contents.length; i++) {
         // Sui Move events don't use the '0x' prefix for asset types - required
-        const assetType = "0x" + imbalanceRatioEvent.imb_ratios.contents[i].key.name
+        const assetType =
+            "0x" + imbalanceRatioEvent.imb_ratios.contents[i].key.name
         const assetIndex = rammSuiPool.assetTypeIndices.get(assetType)
         const assetTicker = rammSuiPool.assetConfigs[assetIndex!].assetTicker
 
-        const imbRatio = imbalanceRatioEvent.imb_ratios.contents[i].value / (10 ** rammSuiPool.precisionDecimalPlaces)
+        const imbRatio =
+            imbalanceRatioEvent.imb_ratios.contents[i].value /
+            10 ** rammSuiPool.precisionDecimalPlaces
 
         imbRatios[assetTicker] = imbRatio
     }
 
     return {
         rammID: imbalanceRatioEvent.ramm_id,
-        imbRatios
+        imbRatios,
     }
 }

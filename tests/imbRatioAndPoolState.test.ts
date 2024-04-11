@@ -1,6 +1,10 @@
-import { 
-    ImbalanceRatioEvent, PoolStateEvent, RAMMSuiPool, SuiSupportedNetworks,
-    processImbRatioEvent, processPoolStateEvent
+import {
+    ImbalanceRatioEvent,
+    PoolStateEvent,
+    RAMMSuiPool,
+    SuiSupportedNetworks,
+    processImbRatioEvent,
+    processPoolStateEvent,
 } from "../src/types"
 import { rammSuiConfigs } from "../src/constants"
 import { TESTNET, sleep, testKeypair } from "./utils"
@@ -36,7 +40,7 @@ describe("Separate Pool state/imb ratio query", () => {
 
         /**
          * Request SUI from the testnet's faucet.
-        */
+         */
 
         await requestSuiFromFaucetV1({
             host: getFaucetHost(TESTNET),
@@ -56,31 +60,54 @@ describe("Separate Pool state/imb ratio query", () => {
             options: {
                 // required, so that we can scrutinize the response's events for the pool state
                 // query
-                showEvents: true
-            }
+                showEvents: true,
+            },
         })
 
-        const poolStateEvent = resp.events!.filter((event) => event.type.split("::")[2] === "PoolStateEvent")[0]
+        const poolStateEvent = resp.events!.filter(
+            (event) => event.type.split("::")[2] === "PoolStateEvent"
+        )[0]
         const poolStateEventJSON = poolStateEvent.parsedJson as PoolStateEvent
         console.log("Pool state event: ", poolStateEventJSON)
 
-        const imbRatioEvent = resp.events!.filter((event) => event.type.split("::")[2] === "ImbalanceRatioEvent")[0]
-        const imbRatioEventJSON = imbRatioEvent.parsedJson as ImbalanceRatioEvent
-        console.log("Imbalance ratio event: ", JSON.stringify(imbRatioEventJSON, null, 4))
+        const imbRatioEvent = resp.events!.filter(
+            (event) => event.type.split("::")[2] === "ImbalanceRatioEvent"
+        )[0]
+        const imbRatioEventJSON =
+            imbRatioEvent.parsedJson as ImbalanceRatioEvent
+        console.log(
+            "Imbalance ratio event: ",
+            JSON.stringify(imbRatioEventJSON, null, 4)
+        )
 
         const {
             poolStateEventJSON: poolStateEventJSON2,
-            imbRatioEventJSON: imbRatioEventJSON2
-        } = await ramm.getPoolStateAndImbalanceRatios(suiClient, testKeypair.toSuiAddress())
+            imbRatioEventJSON: imbRatioEventJSON2,
+        } = await ramm.getPoolStateAndImbalanceRatios(
+            suiClient,
+            testKeypair.toSuiAddress()
+        )
 
         assert.equal(poolStateEventJSON.ramm_id, poolStateEventJSON2.ramm_id)
-        assert.equal(poolStateEventJSON.asset_types.length, poolStateEventJSON2.asset_types.length)
-        assert.equal(poolStateEventJSON.asset_balances.length, poolStateEventJSON2.asset_balances.length)
-        assert.equal(poolStateEventJSON.asset_lpt_issued.length, poolStateEventJSON2.asset_lpt_issued.length)
+        assert.equal(
+            poolStateEventJSON.asset_types.length,
+            poolStateEventJSON2.asset_types.length
+        )
+        assert.equal(
+            poolStateEventJSON.asset_balances.length,
+            poolStateEventJSON2.asset_balances.length
+        )
+        assert.equal(
+            poolStateEventJSON.asset_lpt_issued.length,
+            poolStateEventJSON2.asset_lpt_issued.length
+        )
 
         assert.equal(imbRatioEventJSON.ramm_id, imbRatioEventJSON2.ramm_id)
         assert.equal(imbRatioEventJSON.requester, imbRatioEventJSON2.requester)
-        assert.equal(imbRatioEventJSON.imb_ratios.contents.length, imbRatioEventJSON2.imb_ratios.contents.length)
+        assert.equal(
+            imbRatioEventJSON.imb_ratios.contents.length,
+            imbRatioEventJSON2.imb_ratios.contents.length
+        )
 
         const poolState = processPoolStateEvent(ramm, poolStateEventJSON)
         console.log("Processed pool state: ", poolState)

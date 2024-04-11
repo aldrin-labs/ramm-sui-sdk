@@ -7,7 +7,7 @@ import { RAMMSuiPoolConfig } from "./ramm-sui"
  */
 export enum SuiSupportedNetworks {
     testnet,
-    mainnet
+    mainnet,
 }
 
 /**
@@ -20,5 +20,5 @@ export enum SuiSupportedNetworks {
  * library use to access presently deployed pools.
  */
 export type RAMMSuiPoolConfigs = {
-    [key in SuiSupportedNetworks]: RAMMSuiPoolConfig[];
-  }
+    [key in SuiSupportedNetworks]: RAMMSuiPoolConfig[]
+}
