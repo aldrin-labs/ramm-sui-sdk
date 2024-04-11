@@ -117,17 +117,17 @@ describe("Liquidity withdrawal", () => {
 
         liqWithEventJSON.amounts_out.contents.forEach((assetData) => {
             switch (assetData.key.name) {
-                case btcType: {
-                    expect(Number(assetData.value)).toBeGreaterThan(0)
-                    expect(Number(assetData.value)).toBeLessThanOrEqual(
-                        btcAmount
-                    )
-                    break
-                }
-                default: {
-                    assert.equal(Number(assetData.value), 0)
-                    break
-                }
+            case btcType: {
+                expect(Number(assetData.value)).toBeGreaterThan(0)
+                expect(Number(assetData.value)).toBeLessThanOrEqual(
+                    btcAmount
+                )
+                break
+            }
+            default: {
+                assert.equal(Number(assetData.value), 0)
+                break
+            }
             }
         })
     }, /** timeout for the test, in ms */ 10_000)
