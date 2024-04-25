@@ -118,10 +118,10 @@ export const rammSuiConfigs: RAMMSuiPoolConfigs = {
         {
             name: "Sui Mainnet SUI/USDC/USDT RAMM",
             packageId:
-                "0xcb6640194b37023f6bed705f40ff22883eb6007d4c69e72c317c64671f9f6b29",
+                "0x5b05e2c12f617b33b64ea2b004d89cc18c46b270bc0c214ddd32654fa9a8c84c",
             moduleName: "ramm",
             poolAddress:
-                "0x4ee5425220bc12f2ff633d37b1dc1eb56cc8fd96b1c72c49bd4ce6e895bd6cd7",
+                "0xb764803866f133a5915b79cc37458b0a427450ab73857abfae24eb556d83dc64",
             assetCount: 3,
 
             assetTypeIndices: new Map([
